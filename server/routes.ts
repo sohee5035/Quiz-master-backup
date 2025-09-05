@@ -24,6 +24,20 @@ const upload = multer({ storage: multer.memoryStorage() });
 const sessionQuestionOrders: Map<string, string[]> = new Map();
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // 특정 문제의 선택지 조회 API (다른 라우트보다 먼저 등록)
+  app.get("/api/questions/:questionId/choices", async (req, res) => {
+    try {
+      const questionId = req.params.questionId;
+      console.log(`선택지 조회 요청: questionId=${questionId}`);
+      const choices = await storage.getChoicesForQuestion(questionId);
+      console.log(`조회된 선택지:`, choices);
+      res.json(choices);
+    } catch (error) {
+      console.error("Error fetching choices:", error);
+      res.status(500).json({ message: "선택지 조회에 실패했습니다." });
+    }
+  });
+
   // Questions count endpoint
   // Get all questions
   app.get("/api/questions", async (req, res) => {
@@ -43,18 +57,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Questions count error:', error);
       res.status(500).json({ message: "문제 수 조회 중 오류가 발생했습니다." });
-    }
-  });
-
-  // 특정 문제의 선택지 조회 API
-  app.get("/api/questions/:questionId/choices", async (req, res) => {
-    try {
-      const questionId = req.params.questionId;
-      const choices = await storage.getChoicesForQuestion(questionId);
-      res.json(choices);
-    } catch (error) {
-      console.error("Error fetching choices:", error);
-      res.status(500).json({ message: "선택지 조회에 실패했습니다." });
     }
   });
 
