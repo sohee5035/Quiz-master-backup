@@ -34,9 +34,8 @@ export default function Home({ onStart, onStartTimer, onStartDifficult, onStartW
               <div className="text-base font-semibold text-gray-900 mb-2">외환 마스터가 되는 그 날까지✨</div>
               <div className="text-sm text-gray-700 mb-1">📅 본선 25.09.12 (금) 16:00</div>
               <div className="text-sm text-gray-800 space-y-1">
-                <div>KB 외환 마스터 시험 대비 연습 웹앱입니다.</div>
                 <div>기본 문제는 외환사업부 410 연습문제가 나옵니다!</div>
-                <div>💡 문의사항은 하단 댓글이나 왕소희대리에게 연락주세요!</div>
+                <div className="text-xs font-bold">💡 문의사항이나 의견은 하단 댓글로 남겨주세요!</div>
               </div>
             </div>
           </div>
