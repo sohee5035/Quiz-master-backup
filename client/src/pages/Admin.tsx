@@ -7,9 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Eye, Calendar, BarChart3, Trash2, Globe, MessageSquare } from "lucide-react";
+import { Eye, Calendar, BarChart3, Trash2, Globe, MessageSquare, Edit } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { Badge } from "@/components/ui/badge";
 
@@ -583,12 +584,69 @@ function ManageQuestionsCard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // 편집 상태 관리
+  const [editingQuestion, setEditingQuestion] = useState<any>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editForm, setEditForm] = useState({
+    stem: "",
+    explanation: "",
+    tags: "",
+    difficulty: "",
+    source: "",
+    answer: null as boolean | null,
+    choices: [
+      { content: "", isCorrect: false },
+      { content: "", isCorrect: false },
+      { content: "", isCorrect: false },
+      { content: "", isCorrect: false }
+    ]
+  });
+
   // 모든 문제 조회
   const { data: questions, isLoading, error } = useQuery<any[]>({
     queryKey: ['/api/questions'],
     refetchInterval: 30000, // 30초마다 새로고침
   });
 
+  // 문제 수정 mutation
+  const updateQuestionMutation = useMutation({
+    mutationFn: async ({ questionId, questionData, choices }: { questionId: string; questionData: any; choices?: any[] }) => {
+      const response = await fetch(`/api/admin/questions/${questionId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          question: questionData,
+          choices: choices
+        }),
+      });
+      
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(error);
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "수정 완료",
+        description: data.message || "문제가 수정되었습니다.",
+      });
+      // 캐시 무효화하여 목록 새로고침
+      queryClient.invalidateQueries({ queryKey: ['/api/questions'] });
+      setIsEditModalOpen(false);
+      setEditingQuestion(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "오류",
+        description: error.message || "문제 수정에 실패했습니다.",
+        variant: "destructive",
+      });
+    },
+  });
 
   // 문제 삭제 mutation
   const deleteQuestionMutation = useMutation({
@@ -625,6 +683,114 @@ function ManageQuestionsCard() {
     if (window.confirm(`정말로 이 문제를 삭제하시겠습니까?\n\n"${questionStem.substring(0, 50)}${questionStem.length > 50 ? '...' : ''}"\n\n이 작업은 되돌릴 수 없습니다!`)) {
       deleteQuestionMutation.mutate(questionId);
     }
+  };
+
+  const handleEditQuestion = async (question: any) => {
+    setEditingQuestion(question);
+    
+    // 편집 폼에 기존 데이터 로드
+    setEditForm({
+      stem: question.stem,
+      explanation: question.explanation || "",
+      tags: question.tags || "",
+      difficulty: question.difficulty?.toString() || "",
+      source: question.source || "",
+      answer: question.answer,
+      choices: [
+        { content: "", isCorrect: false },
+        { content: "", isCorrect: false },
+        { content: "", isCorrect: false },
+        { content: "", isCorrect: false }
+      ]
+    });
+
+    // MCQ 문제의 경우 선택지 로드
+    if (question.type === "MCQ") {
+      try {
+        const response = await fetch(`/api/questions/${question.id}/choices`);
+        if (response.ok) {
+          const choices = await response.json();
+          const formattedChoices = choices.map((choice: any) => ({
+            content: choice.content,
+            isCorrect: choice.isCorrect
+          }));
+          
+          // 4개 선택지 보장
+          while (formattedChoices.length < 4) {
+            formattedChoices.push({ content: "", isCorrect: false });
+          }
+          
+          setEditForm(prev => ({
+            ...prev,
+            choices: formattedChoices.slice(0, 4)
+          }));
+        }
+      } catch (error) {
+        console.error("선택지 로드 실패:", error);
+      }
+    }
+
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditSubmit = () => {
+    if (!editingQuestion) return;
+
+    // 기본 검증
+    if (!editForm.stem.trim()) {
+      toast({
+        title: "오류",
+        description: "문제 내용을 입력해주세요.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const questionData = {
+      stem: editForm.stem,
+      explanation: editForm.explanation || null,
+      tags: editForm.tags || null,
+      difficulty: editForm.difficulty ? parseInt(editForm.difficulty) : null,
+      source: editForm.source || null,
+      answer: editingQuestion.type === "OX" ? editForm.answer : null,
+    };
+
+    let choices: any[] | undefined = undefined;
+    
+    if (editingQuestion.type === "MCQ") {
+      // MCQ 선택지 검증
+      const validChoices = editForm.choices.filter(choice => choice.content.trim());
+      const correctChoices = validChoices.filter(choice => choice.isCorrect);
+      
+      if (validChoices.length < 2) {
+        toast({
+          title: "오류",
+          description: "최소 2개의 선택지를 입력해주세요.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      if (correctChoices.length !== 1) {
+        toast({
+          title: "오류",
+          description: "정답은 정확히 1개여야 합니다.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      choices = validChoices.map(choice => ({
+        content: choice.content,
+        isCorrect: choice.isCorrect
+      }));
+    }
+
+    updateQuestionMutation.mutate({
+      questionId: editingQuestion.id,
+      questionData,
+      choices
+    });
   };
 
   if (isLoading) {
@@ -678,16 +844,27 @@ function ManageQuestionsCard() {
                       <p className="text-xs text-gray-500">난이도: {question.difficulty}</p>
                     )}
                   </div>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleDeleteQuestion(question.id, question.stem)}
-                    disabled={deleteQuestionMutation.isPending}
-                    data-testid={`button-delete-${question.id}`}
-                  >
-                    <Trash2 className="h-4 w-4 mr-1" />
-                    {deleteQuestionMutation.isPending ? "삭제 중..." : "삭제"}
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEditQuestion(question)}
+                      data-testid={`button-edit-${question.id}`}
+                    >
+                      <Edit className="h-4 w-4 mr-1" />
+                      수정
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDeleteQuestion(question.id, question.stem)}
+                      disabled={deleteQuestionMutation.isPending}
+                      data-testid={`button-delete-${question.id}`}
+                    >
+                      <Trash2 className="h-4 w-4 mr-1" />
+                      {deleteQuestionMutation.isPending ? "삭제 중..." : "삭제"}
+                    </Button>
+                  </div>
                 </div>
               </div>
             ))
@@ -698,6 +875,167 @@ function ManageQuestionsCard() {
           )}
         </div>
       </CardContent>
+      
+      {/* 편집 모달 */}
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>문제 수정</DialogTitle>
+            <DialogDescription>
+              {editingQuestion?.type === "MCQ" ? "객관식" : "OX"} 문제를 수정합니다.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {/* 문제 내용 */}
+            <div>
+              <Label htmlFor="edit-stem">문제 내용</Label>
+              <Textarea
+                id="edit-stem"
+                value={editForm.stem}
+                onChange={(e) => setEditForm(prev => ({ ...prev, stem: e.target.value }))}
+                placeholder="문제 내용을 입력하세요"
+                className="min-h-20"
+                data-testid="textarea-edit-stem"
+              />
+            </div>
+
+            {/* OX 문제의 정답 선택 */}
+            {editingQuestion?.type === "OX" && (
+              <div>
+                <Label htmlFor="edit-answer">정답</Label>
+                <Select 
+                  value={editForm.answer?.toString() || ""} 
+                  onValueChange={(value) => setEditForm(prev => ({ 
+                    ...prev, 
+                    answer: value === "true" ? true : value === "false" ? false : null 
+                  }))}
+                >
+                  <SelectTrigger data-testid="select-edit-answer">
+                    <SelectValue placeholder="정답을 선택하세요" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="true">O (참)</SelectItem>
+                    <SelectItem value="false">X (거짓)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* MCQ 문제의 선택지 */}
+            {editingQuestion?.type === "MCQ" && (
+              <div>
+                <Label>선택지</Label>
+                <div className="space-y-3">
+                  {editForm.choices.map((choice, index) => (
+                    <div key={index} className="flex items-center space-x-2">
+                      <Input
+                        value={choice.content}
+                        onChange={(e) => {
+                          const newChoices = [...editForm.choices];
+                          newChoices[index].content = e.target.value;
+                          setEditForm(prev => ({ ...prev, choices: newChoices }));
+                        }}
+                        placeholder={`선택지 ${index + 1}`}
+                        className="flex-1"
+                        data-testid={`input-edit-choice-${index + 1}`}
+                      />
+                      <label className="flex items-center space-x-1">
+                        <input
+                          type="radio"
+                          name="edit-correct-answer"
+                          checked={choice.isCorrect}
+                          onChange={() => {
+                            const newChoices = editForm.choices.map((c, i) => ({
+                              ...c,
+                              isCorrect: i === index
+                            }));
+                            setEditForm(prev => ({ ...prev, choices: newChoices }));
+                          }}
+                          data-testid={`radio-edit-correct-${index + 1}`}
+                        />
+                        <span className="text-sm">정답</span>
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 해설 */}
+            <div>
+              <Label htmlFor="edit-explanation">해설</Label>
+              <Textarea
+                id="edit-explanation"
+                value={editForm.explanation}
+                onChange={(e) => setEditForm(prev => ({ ...prev, explanation: e.target.value }))}
+                placeholder="해설을 입력하세요"
+                data-testid="textarea-edit-explanation"
+              />
+            </div>
+
+            {/* 태그 */}
+            <div>
+              <Label htmlFor="edit-tags">태그</Label>
+              <Input
+                id="edit-tags"
+                value={editForm.tags}
+                onChange={(e) => setEditForm(prev => ({ ...prev, tags: e.target.value }))}
+                placeholder="태그를 입력하세요"
+                data-testid="input-edit-tags"
+              />
+            </div>
+
+            {/* 난이도 */}
+            <div>
+              <Label htmlFor="edit-difficulty">난이도</Label>
+              <Select 
+                value={editForm.difficulty} 
+                onValueChange={(value) => setEditForm(prev => ({ ...prev, difficulty: value }))}
+              >
+                <SelectTrigger data-testid="select-edit-difficulty">
+                  <SelectValue placeholder="난이도를 선택하세요" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">1 (쉬움)</SelectItem>
+                  <SelectItem value="2">2 (보통)</SelectItem>
+                  <SelectItem value="3">3 (어려움)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 출처 */}
+            <div>
+              <Label htmlFor="edit-source">출처</Label>
+              <Input
+                id="edit-source"
+                value={editForm.source}
+                onChange={(e) => setEditForm(prev => ({ ...prev, source: e.target.value }))}
+                placeholder="출처를 입력하세요"
+                data-testid="input-edit-source"
+              />
+            </div>
+
+            {/* 버튼들 */}
+            <div className="flex justify-end space-x-2 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => setIsEditModalOpen(false)}
+                data-testid="button-edit-cancel"
+              >
+                취소
+              </Button>
+              <Button
+                onClick={handleEditSubmit}
+                disabled={updateQuestionMutation.isPending}
+                data-testid="button-edit-save"
+              >
+                {updateQuestionMutation.isPending ? "저장 중..." : "저장"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

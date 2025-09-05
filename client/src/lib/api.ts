@@ -42,4 +42,13 @@ export const api = {
     const response = await apiRequest("GET", "/api/comments");
     return response.json();
   },
+
+  // Question management APIs
+  updateQuestion: async (questionId: string, questionData: any, choices?: any[]): Promise<{ success: boolean; message: string; question: any }> => {
+    const response = await apiRequest("PUT", `/api/admin/questions/${questionId}`, {
+      question: questionData,
+      choices: choices
+    });
+    return response.json();
+  },
 };

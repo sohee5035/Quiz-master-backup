@@ -10,8 +10,10 @@ export interface IStorage {
   getQuestions(): Promise<Question[]>;
   getQuestionsByAuthor(author: string): Promise<Question[]>;
   createQuestion(question: InsertQuestion): Promise<Question>;
+  updateQuestion(questionId: string, question: Partial<InsertQuestion>): Promise<Question>;
   getChoicesForQuestion(questionId: string): Promise<Choice[]>;
   createChoice(choice: InsertChoice): Promise<Choice>;
+  updateChoicesForQuestion(questionId: string, choices: InsertChoice[]): Promise<Choice[]>;
   
   // Sessions
   createSession(session: InsertSession): Promise<Session>;
@@ -124,6 +126,24 @@ export class DatabaseStorage implements IStorage {
     return question;
   }
 
+  async updateQuestion(questionId: string, updateData: Partial<InsertQuestion>): Promise<Question> {
+    if (!isDbConnected) {
+      throw new Error("Database not connected");
+    }
+
+    const [updatedQuestion] = await db
+      .update(questions)
+      .set(updateData)
+      .where(eq(questions.id, questionId))
+      .returning();
+    
+    if (!updatedQuestion) {
+      throw new Error("Question not found");
+    }
+    
+    return updatedQuestion;
+  }
+
   async getChoicesForQuestion(questionId: string): Promise<Choice[]> {
     return await db.select().from(choices).where(eq(choices.questionId, questionId));
   }
@@ -135,6 +155,33 @@ export class DatabaseStorage implements IStorage {
       .values({ ...insertChoice, id })
       .returning();
     return choice;
+  }
+
+  async updateChoicesForQuestion(questionId: string, newChoices: InsertChoice[]): Promise<Choice[]> {
+    if (!isDbConnected) {
+      throw new Error("Database not connected");
+    }
+
+    // 기존 선택지들 삭제
+    await db.delete(choices).where(eq(choices.questionId, questionId));
+
+    // 새로운 선택지들 추가
+    const choicesWithIds = newChoices.map(choice => ({
+      ...choice,
+      id: choice.id || randomUUID(),
+      questionId
+    }));
+
+    if (choicesWithIds.length === 0) {
+      return [];
+    }
+
+    const insertedChoices = await db
+      .insert(choices)
+      .values(choicesWithIds)
+      .returning();
+
+    return insertedChoices;
   }
 
   async createSession(insertSession: InsertSession): Promise<Session> {
@@ -382,6 +429,22 @@ export class MemStorage implements IStorage {
     return question;
   }
 
+  async updateQuestion(questionId: string, updateData: Partial<InsertQuestion>): Promise<Question> {
+    const existingQuestion = this.questions.get(questionId);
+    if (!existingQuestion) {
+      throw new Error("Question not found");
+    }
+
+    const updatedQuestion: Question = {
+      ...existingQuestion,
+      ...updateData,
+      id: questionId, // ID는 변경되지 않음
+    };
+
+    this.questions.set(questionId, updatedQuestion);
+    return updatedQuestion;
+  }
+
   async getChoicesForQuestion(questionId: string): Promise<Choice[]> {
     return Array.from(this.choices.values()).filter(
       choice => choice.questionId === questionId
@@ -393,6 +456,28 @@ export class MemStorage implements IStorage {
     const choice: Choice = { ...insertChoice, id };
     this.choices.set(id, choice);
     return choice;
+  }
+
+  async updateChoicesForQuestion(questionId: string, newChoices: InsertChoice[]): Promise<Choice[]> {
+    // 기존 선택지들 삭제
+    const choicesToDelete = Array.from(this.choices.values())
+      .filter(choice => choice.questionId === questionId);
+    choicesToDelete.forEach(choice => this.choices.delete(choice.id));
+
+    // 새로운 선택지들 추가
+    const insertedChoices: Choice[] = [];
+    for (const choiceData of newChoices) {
+      const id = choiceData.id || randomUUID();
+      const choice: Choice = {
+        ...choiceData,
+        id,
+        questionId
+      };
+      this.choices.set(id, choice);
+      insertedChoices.push(choice);
+    }
+
+    return insertedChoices;
   }
 
   async createSession(insertSession: InsertSession): Promise<Session> {

@@ -805,6 +805,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // 관리자 API - 개별 문제 수정
+  app.put("/api/admin/questions/:id", async (req, res) => {
+    try {
+      const questionId = req.params.id;
+      
+      // 문제가 존재하는지 확인
+      const existingQuestion = await storage.getQuestion(questionId);
+      if (!existingQuestion) {
+        return res.status(404).json({ message: "문제를 찾을 수 없습니다." });
+      }
+
+      // 요청 데이터 검증
+      const { question, choices } = req.body;
+      
+      if (!question) {
+        return res.status(400).json({ message: "문제 데이터가 필요합니다." });
+      }
+
+      // 문제 업데이트
+      const updatedQuestion = await storage.updateQuestion(questionId, question);
+
+      // MCQ 문제의 경우 선택지도 업데이트
+      if (question.type === "MCQ" && choices && Array.isArray(choices)) {
+        await storage.updateChoicesForQuestion(questionId, choices);
+      }
+      
+      res.json({ 
+        message: "문제가 성공적으로 수정되었습니다.",
+        question: updatedQuestion
+      });
+    } catch (error) {
+      console.error("Error updating question:", error);
+      res.status(500).json({ message: "문제 수정에 실패했습니다." });
+    }
+  });
+
   // 관리자 API - 개별 문제 삭제
   app.delete("/api/admin/questions/:id", async (req, res) => {
     try {
