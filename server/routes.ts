@@ -264,8 +264,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let questions;
       if (mode === "wangsohee" || mode === "wangsohee-timer") {
         questions = await storage.getQuestionsByAuthor("wangsohee");
+      } else if (mode === "difficult") {
+        // For difficult mode, get ALL questions (not just default)
+        questions = await storage.getQuestions();
       } else {
-        // Only get default questions for non-wangsohee modes
+        // Only get default questions for regular study modes
         questions = await storage.getQuestionsByAuthor("default");
       }
       
