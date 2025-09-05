@@ -13,36 +13,37 @@ interface HomeProps {
 
 export default function Home({ onStart, onStartTimer, onStartDifficult, onStartWangsohee, onStartWangsoheeTimer }: HomeProps) {
   return (
-    <div className="container mx-auto max-w-2xl p-6">
-      <Card className="mt-8 shadow-sm">
-        <CardContent className="p-8">
-          <div className="text-center mb-8">
-            <div className="mb-6">
+    <div className="container mx-auto max-w-6xl p-4">
+      <Card className="mt-4 shadow-sm">
+        <CardContent className="p-6">
+          {/* 간소화된 헤더 */}
+          <div className="text-center mb-6">
+            <div className="flex items-center justify-center gap-4 mb-4">
               <img 
                 src={mascotImage} 
                 alt="KB 외환 마스터 캐릭터" 
-                className="w-32 h-32 mx-auto rounded-full bg-orange-50 p-2"
+                className="w-20 h-20 rounded-full bg-orange-50 p-1"
               />
-            </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">🏆 KB 외환 마스터 👑</h1>
-          </div>
-
-          <div className="bg-yellow-50 rounded-xl border border-yellow-200 p-6 mb-8">
-            <div className="text-center mb-4">
-              <div className="text-lg font-semibold text-gray-900 mb-3">외환 마스터가 되는 그 날까지✨</div>
-              <div className="text-lg font-semibold text-gray-900 mb-1">📅 예선 25.08.27 (수) 17:00</div>
-              <div className="text-lg font-semibold text-gray-900 mb-4">📅 본선 25.09.12 (금) 16:00</div>
-            </div>
-            <div className="border-t border-yellow-300 pt-4">
-              <div className="text-sm text-gray-700 mb-3">본 페이지는 KB 외환 마스터 시험 대비 연습 웹앱입니다.</div>
-              <div className="text-sm text-gray-700 mb-2">   • 📚 기본 문제 모드: 외환사업부 410의 출제 예상 문제</div>
-              <div className="text-sm text-gray-700 mb-2">   • 👑 왕소희 제작 문제: 본선 범위에 해당되는 문제</div>
-              <div className="text-sm text-gray-700 mb-3">   • ⏰ 타이머 모드: 실제 시험과 유사한 환경에서 실전 연습</div>
-              <div className="text-sm text-gray-700">💡 궁금한 점이나 오류 발견 시 하단 댓글로 남겨주시거나 왕소희대리에게 연락주세요!</div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">🏆 KB 외환 마스터 👑</h1>
             </div>
           </div>
 
-          <div className="space-y-6">
+          {/* 간소화된 안내 박스 */}
+          <div className="bg-yellow-50 rounded-lg border border-yellow-200 p-4 mb-6">
+            <div className="grid md:grid-cols-2 gap-4 text-center">
+              <div>
+                <div className="text-base font-semibold text-gray-900 mb-1">외환 마스터가 되는 그 날까지✨</div>
+                <div className="text-sm text-gray-700">📅 예선 25.08.27 (수) 17:00 | 본선 25.09.12 (금) 16:00</div>
+              </div>
+              <div className="text-xs text-gray-600">
+                KB 외환 마스터 시험 대비 연습 웹앱 📚 기본문제 👑 왕소희문제 ⏰ 타이머모드
+                <br />💡 문의사항은 하단 댓글이나 왕소희대리에게 연락주세요!
+              </div>
+            </div>
+          </div>
+
+          {/* 메인 버튼 그리드 */}
+          <div className="grid lg:grid-cols-2 gap-6 mb-6">
             {/* 1. 기본 학습 모드 */}
             <div className="bg-blue-50 rounded-xl border border-blue-200 p-5">
               <div className="text-center mb-4">
@@ -90,7 +91,10 @@ export default function Home({ onStart, onStartTimer, onStartDifficult, onStartW
                 </Button>
               </div>
             </div>
+          </div>
 
+          {/* 하단 버튼 그룹 */}
+          <div className="grid lg:grid-cols-2 gap-6">
             {/* 3. 집중 공략 모드 */}
             <div className="bg-purple-50 rounded-xl border border-purple-200 p-5">
               <div className="text-center mb-4">
