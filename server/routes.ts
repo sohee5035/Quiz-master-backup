@@ -1016,6 +1016,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // 관리자용 댓글 삭제 API
+  app.delete("/api/admin/comments/:id", async (req, res) => {
+    try {
+      const commentId = req.params.id;
+      
+      if (!commentId) {
+        return res.status(400).json({ message: "댓글 ID가 필요합니다." });
+      }
+
+      await storage.deleteComment(commentId);
+      
+      res.json({
+        success: true,
+        message: "댓글이 성공적으로 삭제되었습니다."
+      });
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      res.status(500).json({ message: "댓글 삭제에 실패했습니다." });
+    }
+  });
+
   // Page view tracking middleware (after all API routes)
   app.use(async (req, res, next) => {
     // 정적 파일과 API 경로는 제외

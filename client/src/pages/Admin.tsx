@@ -486,6 +486,9 @@ function VisitorStatsCard() {
 
 // 댓글 관리 컴포넌트
 function CommentManagementCard() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
   const { data: commentsData, isLoading } = useQuery<{
     success: boolean;
     comments: any[];
@@ -493,6 +496,28 @@ function CommentManagementCard() {
   }>({
     queryKey: ['/api/comments'],
     refetchInterval: 30000, // 30초마다 새로고침
+  });
+
+  // 댓글 삭제 mutation
+  const deleteCommentMutation = useMutation({
+    mutationFn: async (commentId: string) => {
+      const response = await apiRequest("DELETE", `/api/admin/comments/${commentId}`);
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "삭제 완료",
+        description: "댓글이 성공적으로 삭제되었습니다.",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/comments'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "삭제 실패",
+        description: error.message || "댓글 삭제에 실패했습니다.",
+        variant: "destructive",
+      });
+    },
   });
 
   if (isLoading) {
@@ -560,6 +585,22 @@ function CommentManagementCard() {
                         브라우저: {comment.userAgent}
                       </div>
                     )}
+                  </div>
+                  <div className="flex-shrink-0">
+                    <Button
+                      onClick={() => {
+                        if (confirm("정말로 이 댓글을 삭제하시겠습니까?")) {
+                          deleteCommentMutation.mutate(comment.id);
+                        }
+                      }}
+                      disabled={deleteCommentMutation.isPending}
+                      variant="destructive"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      data-testid={`button-delete-comment-${comment.id}`}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
               </div>

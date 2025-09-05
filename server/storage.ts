@@ -38,6 +38,7 @@ export interface IStorage {
   createComment(comment: InsertComment): Promise<Comment>;
   getAllComments(): Promise<Comment[]>;
   getCommentsByIP(ipAddress: string): Promise<Comment[]>;
+  deleteComment(commentId: string): Promise<void>;
   
   // Utility
   deleteQuestion(questionId: string): Promise<void>;
@@ -339,6 +340,14 @@ export class DatabaseStorage implements IStorage {
     }
 
     return await db.select().from(comments).where(eq(comments.ipAddress, ipAddress)).orderBy(comments.createdAt);
+  }
+
+  async deleteComment(commentId: string): Promise<void> {
+    if (!isDbConnected) {
+      throw new Error("Database not connected");
+    }
+
+    await db.delete(comments).where(eq(comments.id, commentId));
   }
 }
 
@@ -651,6 +660,10 @@ export class MemStorage implements IStorage {
     return Array.from(this.comments.values())
       .filter(comment => comment.ipAddress === ipAddress)
       .sort((a, b) => a.createdAt!.getTime() - b.createdAt!.getTime());
+  }
+
+  async deleteComment(commentId: string): Promise<void> {
+    this.comments.delete(commentId);
   }
 }
 
