@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import CommentSection from "@/components/CommentSection";
 import mascotImage from "@assets/Adobe Express 2025-08-21 12시 40분 8초_1755747624195.png";
 
 interface HomeProps {
@@ -119,6 +120,9 @@ export default function Home({ onStart, onStartTimer, onStartDifficult, onStartW
           </div>
         </CardContent>
       </Card>
+      
+      {/* 댓글 섹션 */}
+      <CommentSection />
     </div>
   );
 }

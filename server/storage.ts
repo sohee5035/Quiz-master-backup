@@ -1,6 +1,6 @@
-import { type Question, type Choice, type Session, type Response, type PageView, type InsertQuestion, type InsertChoice, type InsertSession, type InsertResponse, type InsertPageView } from "@shared/schema";
+import { type Question, type Choice, type Session, type Response, type PageView, type Comment, type InsertQuestion, type InsertChoice, type InsertSession, type InsertResponse, type InsertPageView, type InsertComment } from "@shared/schema";
 import { database as db, isDbConnected } from "./db";
-import { questions, choices, sessions, responses, pageViews } from "@shared/schema";
+import { questions, choices, sessions, responses, pageViews, comments } from "@shared/schema";
 import { eq, sql, gte } from "drizzle-orm";
 import { randomUUID } from "crypto";
 
@@ -31,6 +31,11 @@ export interface IStorage {
   getTodayUniqueVisitors(): Promise<number>;
   getTotalUniqueVisitors(): Promise<number>;
   getVisitorStatsByIP(): Promise<{ipAddress: string; visitCount: number; lastVisitAt: Date}[]>;
+  
+  // Comments
+  createComment(comment: InsertComment): Promise<Comment>;
+  getAllComments(): Promise<Comment[]>;
+  getCommentsByIP(ipAddress: string): Promise<Comment[]>;
   
   // Utility
   deleteQuestion(questionId: string): Promise<void>;
@@ -255,6 +260,38 @@ export class DatabaseStorage implements IStorage {
     await db.delete(choices);
     await db.delete(questions);
     await db.delete(pageViews);
+    await db.delete(comments);
+  }
+
+  // Comments
+  async createComment(comment: InsertComment): Promise<Comment> {
+    if (!isDbConnected) {
+      throw new Error("Database not connected");
+    }
+
+    const newComment = {
+      id: randomUUID(),
+      ...comment,
+    };
+
+    const [insertedComment] = await db.insert(comments).values(newComment).returning();
+    return insertedComment;
+  }
+
+  async getAllComments(): Promise<Comment[]> {
+    if (!isDbConnected) {
+      throw new Error("Database not connected");
+    }
+
+    return await db.select().from(comments).orderBy(comments.createdAt);
+  }
+
+  async getCommentsByIP(ipAddress: string): Promise<Comment[]> {
+    if (!isDbConnected) {
+      throw new Error("Database not connected");
+    }
+
+    return await db.select().from(comments).where(eq(comments.ipAddress, ipAddress)).orderBy(comments.createdAt);
   }
 }
 
@@ -264,6 +301,7 @@ export class MemStorage implements IStorage {
   private sessions: Map<string, Session>;
   private responses: Map<string, Response>;
   private pageViews: Map<string, PageView>;
+  private comments: Map<string, Comment>;
 
   constructor() {
     this.questions = new Map();
@@ -271,6 +309,7 @@ export class MemStorage implements IStorage {
     this.sessions = new Map();
     this.responses = new Map();
     this.pageViews = new Map();
+    this.comments = new Map();
     
     this.seedData();
   }
@@ -503,6 +542,30 @@ export class MemStorage implements IStorage {
     this.choices.clear();
     this.questions.clear();
     this.pageViews.clear();
+    this.comments.clear();
+  }
+
+  // Comments (in-memory implementation)
+  async createComment(comment: InsertComment): Promise<Comment> {
+    const newComment: Comment = {
+      id: `comment-${Date.now()}-${Math.random().toString(36).substring(2)}`,
+      content: comment.content,
+      ipAddress: comment.ipAddress,
+      userAgent: comment.userAgent || null,
+      createdAt: new Date(),
+    };
+    this.comments.set(newComment.id, newComment);
+    return newComment;
+  }
+
+  async getAllComments(): Promise<Comment[]> {
+    return Array.from(this.comments.values()).sort((a, b) => a.createdAt!.getTime() - b.createdAt!.getTime());
+  }
+
+  async getCommentsByIP(ipAddress: string): Promise<Comment[]> {
+    return Array.from(this.comments.values())
+      .filter(comment => comment.ipAddress === ipAddress)
+      .sort((a, b) => a.createdAt!.getTime() - b.createdAt!.getTime());
   }
 }
 

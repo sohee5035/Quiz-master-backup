@@ -902,6 +902,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Comment endpoints
+  app.post("/api/comments", async (req, res) => {
+    try {
+      const { content } = req.body;
+      
+      if (!content || content.trim().length === 0) {
+        return res.status(400).json({ message: "댓글 내용을 입력해주세요." });
+      }
+
+      if (content.length > 500) {
+        return res.status(400).json({ message: "댓글은 500자 이하로 작성해주세요." });
+      }
+
+      // IP 주소 추출
+      const realIP = req.get('X-Real-IP') || 
+                    req.get('X-Forwarded-For')?.split(',')[0] || 
+                    req.ip || 
+                    req.connection.remoteAddress || 
+                    'unknown';
+
+      const commentData = {
+        content: content.trim(),
+        ipAddress: realIP,
+        userAgent: req.get('User-Agent') || null
+      };
+
+      const newComment = await storage.createComment(commentData);
+      
+      res.json({
+        success: true,
+        comment: newComment,
+        message: "댓글이 성공적으로 등록되었습니다."
+      });
+    } catch (error) {
+      console.error("Error creating comment:", error);
+      res.status(500).json({ message: "댓글 등록에 실패했습니다." });
+    }
+  });
+
+  app.get("/api/comments", async (req, res) => {
+    try {
+      const comments = await storage.getAllComments();
+      
+      res.json({
+        success: true,
+        comments: comments,
+        total: comments.length
+      });
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+      res.status(500).json({ message: "댓글을 불러오는데 실패했습니다." });
+    }
+  });
+
   // Page view tracking middleware (after all API routes)
   app.use(async (req, res, next) => {
     // 정적 파일과 API 경로는 제외

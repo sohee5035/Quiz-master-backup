@@ -31,4 +31,15 @@ export const api = {
     const response = await apiRequest("POST", `/api/session/${sessionId}/finish`);
     return response.json();
   },
+
+  // Comment APIs
+  createComment: async (content: string): Promise<{ success: boolean; message: string; comment: any }> => {
+    const response = await apiRequest("POST", "/api/comments", { content });
+    return response.json();
+  },
+
+  getComments: async (): Promise<{ success: boolean; comments: any[]; total: number }> => {
+    const response = await apiRequest("GET", "/api/comments");
+    return response.json();
+  },
 };
