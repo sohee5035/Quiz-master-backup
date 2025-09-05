@@ -707,9 +707,14 @@ function ManageQuestionsCard() {
     // MCQ 문제의 경우 선택지 로드
     if (question.type === "MCQ") {
       try {
+        console.log(`선택지 로드 시도: /api/questions/${question.id}/choices`);
         const response = await fetch(`/api/questions/${question.id}/choices`);
+        console.log("응답 상태:", response.status, response.statusText);
+        
         if (response.ok) {
           const choices = await response.json();
+          console.log("로드된 선택지:", choices);
+          
           const formattedChoices = choices.map((choice: any) => ({
             content: choice.content,
             isCorrect: choice.isCorrect
@@ -720,10 +725,15 @@ function ManageQuestionsCard() {
             formattedChoices.push({ content: "", isCorrect: false });
           }
           
+          console.log("포맷된 선택지:", formattedChoices);
+          
           setEditForm(prev => ({
             ...prev,
             choices: formattedChoices.slice(0, 4)
           }));
+        } else {
+          const errorText = await response.text();
+          console.error("선택지 로드 실패 - 응답 에러:", response.status, errorText);
         }
       } catch (error) {
         console.error("선택지 로드 실패:", error);
