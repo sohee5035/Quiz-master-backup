@@ -41,58 +41,85 @@ export default function Home({ onStart, onStartTimer, onStartDifficult, onStartW
             </div>
           </div>
 
-          <div className="space-y-3">
-            <Button
-              onClick={() => onStart()}
-              className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-4 px-6 rounded-xl transition-colors duration-200 shadow-sm"
-              data-testid="button-start-session-all"
-            >
-              전체 문제풀이 시작
-            </Button>
-            
-            <Button
-              onClick={onStartTimer}
-              className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-4 px-6 rounded-xl transition-colors duration-200 shadow-sm"
-              data-testid="button-start-timer-mode"
-            >
-              ⚡ 타이머 모드 (10초 제한) ⚡
-            </Button>
-            
-            <Button
-              onClick={onStartDifficult}
-              className="w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold py-4 px-6 rounded-xl transition-colors duration-200 shadow-sm"
-              data-testid="button-start-difficult"
-            >
-              🤔 남들은 뭘 많이 틀렸을까? (TOP 20)
-            </Button>
-            
-            <Button
-              onClick={onStartWangsohee}
-              className="w-full bg-pink-500 hover:bg-pink-600 text-white font-semibold py-4 px-6 rounded-xl transition-colors duration-200 shadow-sm"
-              data-testid="button-start-wangsohee"
-            >
-              👑 왕소희 제작 문제 풀어보기 👑
-            </Button>
-            
-            <Button
-              onClick={onStartWangsoheeTimer}
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-4 px-6 rounded-xl transition-colors duration-200 shadow-sm"
-              data-testid="button-start-wangsohee-timer"
-            >
-              ⚡👑 왕소희 문제 타이머 모드 👑⚡
-            </Button>
-            
-            <Button
-              onClick={() => onStart(10)}
-              className="w-full bg-gray-400 hover:bg-gray-500 text-white font-semibold py-4 px-6 rounded-xl transition-colors duration-200 shadow-sm"
-              data-testid="button-start-session-random"
-            >
-              랜덤 10문제 시작
-            </Button>
+          <div className="space-y-6">
+            {/* 1. 기본 학습 모드 */}
+            <div className="bg-blue-50 rounded-xl border border-blue-200 p-5">
+              <div className="text-center mb-4">
+                <h3 className="text-lg font-semibold text-blue-800 mb-2">📚 기본 학습 모드</h3>
+                <p className="text-sm text-blue-600">기본 출제 예상 문제로 학습해보세요</p>
+              </div>
+              <div className="space-y-3">
+                <Button
+                  onClick={() => onStart()}
+                  className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 px-6 rounded-xl transition-colors duration-200 shadow-sm"
+                  data-testid="button-start-session-all"
+                >
+                  🏃‍♀️ 전체 문제풀이 시작
+                </Button>
+                <Button
+                  onClick={onStartTimer}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-xl transition-colors duration-200 shadow-sm"
+                  data-testid="button-start-timer-mode"
+                >
+                  ⚡ 타이머 모드 (10초 제한)
+                </Button>
+              </div>
+            </div>
 
-            {/* 난이도별 문제풀이 */}
-            <div className="border-t pt-4 mt-6">
-              <h3 className="text-lg font-semibold text-gray-700 mb-3 text-center">난이도별 문제풀이</h3>
+            {/* 2. 왕소희 제작 문제 */}
+            <div className="bg-pink-50 rounded-xl border border-pink-200 p-5">
+              <div className="text-center mb-4">
+                <h3 className="text-lg font-semibold text-pink-800 mb-2">👑 왕소희 제작 문제</h3>
+                <p className="text-sm text-pink-600">추가로 제작한 연습 문제들</p>
+              </div>
+              <div className="space-y-3">
+                <Button
+                  onClick={onStartWangsohee}
+                  className="w-full bg-pink-500 hover:bg-pink-600 text-white font-semibold py-4 px-6 rounded-xl transition-colors duration-200 shadow-sm"
+                  data-testid="button-start-wangsohee"
+                >
+                  👑 왕소희 제작 문제 풀어보기
+                </Button>
+                <Button
+                  onClick={onStartWangsoheeTimer}
+                  className="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-4 px-6 rounded-xl transition-colors duration-200 shadow-sm"
+                  data-testid="button-start-wangsohee-timer"
+                >
+                  ⚡👑 왕소희 문제 타이머 모드
+                </Button>
+              </div>
+            </div>
+
+            {/* 3. 집중 공략 모드 */}
+            <div className="bg-purple-50 rounded-xl border border-purple-200 p-5">
+              <div className="text-center mb-4">
+                <h3 className="text-lg font-semibold text-purple-800 mb-2">🎯 집중 공략 모드</h3>
+                <p className="text-sm text-purple-600">약점 보완과 빠른 복습용</p>
+              </div>
+              <div className="space-y-3">
+                <Button
+                  onClick={onStartDifficult}
+                  className="w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold py-4 px-6 rounded-xl transition-colors duration-200 shadow-sm"
+                  data-testid="button-start-difficult"
+                >
+                  🤔 남들은 뭘 많이 틀렸을까? (TOP 20)
+                </Button>
+                <Button
+                  onClick={() => onStart(10)}
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-4 px-6 rounded-xl transition-colors duration-200 shadow-sm"
+                  data-testid="button-start-session-random"
+                >
+                  🎲 랜덤 10문제 시작
+                </Button>
+              </div>
+            </div>
+
+            {/* 4. 난이도별 연습 */}
+            <div className="bg-gray-50 rounded-xl border border-gray-200 p-5">
+              <div className="text-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">⚡ 난이도별 연습</h3>
+                <p className="text-sm text-gray-600">난이도를 선택해서 집중 학습</p>
+              </div>
               <div className="grid grid-cols-3 gap-3">
                 <Button
                   onClick={() => onStart(undefined, 1)}
