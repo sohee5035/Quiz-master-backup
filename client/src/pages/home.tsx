@@ -34,10 +34,11 @@ export default function Home({ onStart, onStartTimer, onStartDifficult, onStartW
               <div className="text-lg font-semibold text-gray-900 mb-4">📅 본선 25.09.12 (금) 16:00</div>
             </div>
             <div className="border-t border-yellow-300 pt-4">
-              <div className="text-sm text-gray-700 mb-2">📘 본 페이지는 외환사업부 410의 출제 예상 문제를 보기와 순서가 랜덤하게 나오도록 설정한 것입니다.</div>
-              <div className="text-sm text-gray-700 mb-2">⚖️ 하단 난이도별 문제는 제작자인 제가 느끼는 난이도이니, 참고해주세요~!</div>
-              <div className="text-sm font-bold text-gray-800 mb-2">🏆 타이머모드는 정말 실전처럼 연습할 수 있어요! 추천드립니다 ^^</div>
-              <div className="text-sm text-gray-700">😎 참고로 저도 문제 풀다가 모바일로 보기 편하게 한 번 만들어봤어요. 문제를 수기로 등록한지라, 오류가 있을수도 있습니다 ㅎㅎ 오류 발견하시면 왕소희대리 앞으로 연락주세요!</div>
+              <div className="text-sm text-gray-700 mb-3">본 페이지는 KB 외환 마스터 시험 대비 연습 웹앱입니다.</div>
+              <div className="text-sm text-gray-700 mb-2">   • 📚 기본 문제 모드: 외환사업부 410의 출제 예상 문제</div>
+              <div className="text-sm text-gray-700 mb-2">   • 👑 왕소희 제작 문제: 본선 범위에 해당되는 문제</div>
+              <div className="text-sm text-gray-700 mb-3">   • ⏰ 타이머 모드: 실제 시험과 유사한 환경에서 실전 연습</div>
+              <div className="text-sm text-gray-700">💡 궁금한 점이나 오류 발견 시 하단 댓글로 남겨주시거나 왕소희대리에게 연락주세요!</div>
             </div>
           </div>
 
