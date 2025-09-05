@@ -14,9 +14,10 @@ import Admin from "./pages/Admin";
 import TimerMode from "./pages/TimerMode.tsx";
 import TimerResults from "./pages/TimerResults.tsx";
 import TimerSetup from "./pages/TimerSetup";
+import WangsoheeTimerSetup from "./pages/WangsoheeTimerSetup";
 import type { SessionResponse, AnswerResponse, ResultsResponse, TimerQuestionData, TimerResultsData } from "@shared/schema";
 
-type AppState = "home" | "question" | "results" | "admin" | "timer" | "timer-results" | "timer-setup";
+type AppState = "home" | "question" | "results" | "admin" | "timer" | "timer-results" | "timer-setup" | "wangsohee-timer-setup";
 
 function AppContent() {
   const [appState, setAppState] = useState<AppState>("home");
@@ -109,6 +110,36 @@ function AppContent() {
     },
   });
 
+  const startWangsoheeTimerMutation = useMutation({
+    mutationFn: (questionCount: number) => api.startSession("wangsohee-timer", questionCount),
+    onSuccess: (data) => {
+      // 첫 번째 문제로 왕소희 타이머 세션 시작
+      const initialQuestion: TimerQuestionData = {
+        sessionId: data.sessionId,
+        question: data.question,
+        currentQuestion: data.currentQuestion,
+        totalQuestions: data.totalQuestions,
+        isAnswered: false,
+      };
+      setTimerQuestions([initialQuestion]);
+      setCurrentTimerIndex(0);
+      setAppState("timer");
+      
+      toast({
+        title: "왕소희 타이머 모드 시작!",
+        description: "왕소희님이 만든 문제들을 타이머와 함께 풀어보세요! 👑⚡",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "오류", 
+        description: "왕소희 타이머 모드를 시작할 수 없습니다. 왕소희 문제가 충분하지 않을 수 있습니다.",
+        variant: "destructive",
+      });
+      console.error("Failed to start wangsohee timer mode:", error);
+    },
+  });
+
   // 왕소희 제작 문제 세션 시작
   const startWangsoheeMutation = useMutation({
     mutationFn: () => api.startSession("wangsohee"),
@@ -196,6 +227,15 @@ function AppContent() {
 
   const handleStartTimerWithCount = (questionCount: number) => {
     startTimerMutation.mutate(questionCount);
+  };
+
+  const handleStartWangsoheeTimer = () => {
+    setAppState("wangsohee-timer-setup");
+  };
+
+  const handleStartWangsoheeTimerWithCount = (questionCount: number) => {
+    // 왕소희 타이머 모드용 mutation 추가 필요
+    startWangsoheeTimerMutation.mutate(questionCount);
   };
 
   const handleTimerAnswer = async (answer: { selectedChoiceId?: string; selectedBoolean?: boolean }) => {
@@ -369,6 +409,7 @@ function AppContent() {
           onStartTimer={handleStartTimer} 
           onStartDifficult={() => startDifficultMutation.mutate()}
           onStartWangsohee={() => startWangsoheeMutation.mutate()}
+          onStartWangsoheeTimer={handleStartWangsoheeTimer}
         />
       )}
 
@@ -412,6 +453,13 @@ function AppContent() {
       {appState === "timer-setup" && (
         <TimerSetup
           onStart={handleStartTimerWithCount}
+          onBack={handleHome}
+        />
+      )}
+
+      {appState === "wangsohee-timer-setup" && (
+        <WangsoheeTimerSetup
+          onStart={handleStartWangsoheeTimerWithCount}
           onBack={handleHome}
         />
       )}

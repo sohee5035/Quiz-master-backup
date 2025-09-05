@@ -238,7 +238,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Get questions based on mode
       let questions;
-      if (mode === "wangsohee") {
+      if (mode === "wangsohee" || mode === "wangsohee-timer") {
         questions = await storage.getQuestionsByAuthor("wangsohee");
       } else {
         // Only get default questions for non-wangsohee modes
@@ -246,7 +246,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       if (questions.length === 0) {
-        if (mode === "wangsohee") {
+        if (mode === "wangsohee" || mode === "wangsohee-timer") {
           return res.status(404).json({ message: "아직 왕소희 제작 문제가 없습니다." });
         }
         return res.status(404).json({ message: "No questions available" });

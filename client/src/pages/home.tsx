@@ -7,9 +7,10 @@ interface HomeProps {
   onStartTimer: () => void;
   onStartDifficult: () => void;
   onStartWangsohee: () => void;
+  onStartWangsoheeTimer: () => void;
 }
 
-export default function Home({ onStart, onStartTimer, onStartDifficult, onStartWangsohee }: HomeProps) {
+export default function Home({ onStart, onStartTimer, onStartDifficult, onStartWangsohee, onStartWangsoheeTimer }: HomeProps) {
   return (
     <div className="container mx-auto max-w-2xl p-6">
       <Card className="mt-8 shadow-sm">
@@ -70,6 +71,14 @@ export default function Home({ onStart, onStartTimer, onStartDifficult, onStartW
               data-testid="button-start-wangsohee"
             >
               👑 왕소희 제작 문제 풀어보기 👑
+            </Button>
+            
+            <Button
+              onClick={onStartWangsoheeTimer}
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-4 px-6 rounded-xl transition-colors duration-200 shadow-sm"
+              data-testid="button-start-wangsohee-timer"
+            >
+              ⚡👑 왕소희 문제 타이머 모드 👑⚡
             </Button>
             
             <Button
