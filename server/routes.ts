@@ -152,7 +152,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // 어려운 문제 TOP 20 가져오기
   app.get("/api/questions/difficult-top20", async (req, res) => {
     try {
-      const questions = await storage.getQuestions();
+      const questions = await storage.getQuestions(); // 모든 문제 대상 (기본 + 왕소희 문제)
       const questionStats = [];
 
       for (const question of questions) {
