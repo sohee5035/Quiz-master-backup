@@ -30,14 +30,13 @@ export default function Home({ onStart, onStartTimer, onStartDifficult, onStartW
 
           {/* 간소화된 안내 박스 */}
           <div className="bg-yellow-50 rounded-lg border border-yellow-200 p-4 mb-6">
-            <div className="grid md:grid-cols-2 gap-4 text-center">
-              <div>
-                <div className="text-base font-semibold text-gray-900 mb-1">외환 마스터가 되는 그 날까지✨</div>
-                <div className="text-sm text-gray-700">📅 예선 25.08.27 (수) 17:00 | 본선 25.09.12 (금) 16:00</div>
-              </div>
-              <div className="text-xs text-gray-600">
-                KB 외환 마스터 시험 대비 연습 웹앱 📚 기본문제 👑 왕소희문제 ⏰ 타이머모드
-                <br />💡 문의사항은 하단 댓글이나 왕소희대리에게 연락주세요!
+            <div className="text-center space-y-3">
+              <div className="text-base font-semibold text-gray-900 mb-2">외환 마스터가 되는 그 날까지✨</div>
+              <div className="text-sm text-gray-700 mb-1">📅 본선 25.09.12 (금) 16:00</div>
+              <div className="text-sm text-gray-800 space-y-1">
+                <div>KB 외환 마스터 시험 대비 연습 웹앱입니다.</div>
+                <div>기본 문제는 외환사업부 410 연습문제가 나옵니다!</div>
+                <div>💡 문의사항은 하단 댓글이나 왕소희대리에게 연락주세요!</div>
               </div>
             </div>
           </div>
