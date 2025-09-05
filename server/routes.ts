@@ -46,6 +46,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // 특정 문제의 선택지 조회 API
+  app.get("/api/questions/:questionId/choices", async (req, res) => {
+    try {
+      const questionId = req.params.questionId;
+      const choices = await storage.getChoicesForQuestion(questionId);
+      res.json(choices);
+    } catch (error) {
+      console.error("Error fetching choices:", error);
+      res.status(500).json({ message: "선택지 조회에 실패했습니다." });
+    }
+  });
+
   // Admin stats endpoint (before page view middleware)
   app.get("/api/admin/stats", async (req, res) => {
     try {
