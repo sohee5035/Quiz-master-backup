@@ -24,16 +24,26 @@ const upload = multer({ storage: multer.memoryStorage() });
 const sessionQuestionOrders: Map<string, string[]> = new Map();
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // 특정 문제의 선택지 조회 API (다른 라우트보다 먼저 등록)
-  app.get("/api/questions/:questionId/choices", async (req, res) => {
+  // 특정 문제의 선택지 조회 API
+  app.get("/api/admin/questions/:questionId/choices", async (req, res) => {
     try {
       const questionId = req.params.questionId;
-      console.log(`선택지 조회 요청: questionId=${questionId}`);
+      console.log(`✅ 선택지 조회 API 호출됨: questionId=${questionId}`);
+      console.log(`Request URL: ${req.originalUrl}`);
+      console.log(`Request method: ${req.method}`);
+      
       const choices = await storage.getChoicesForQuestion(questionId);
-      console.log(`조회된 선택지:`, choices);
-      res.json(choices);
+      console.log(`✅ 조회된 선택지 개수: ${choices.length}`);
+      console.log(`✅ 선택지 내용:`, choices);
+      
+      // 명시적으로 JSON 응답 헤더 설정
+      res.setHeader('Content-Type', 'application/json');
+      const response = JSON.stringify(choices);
+      console.log(`✅ 전송할 JSON 응답: ${response}`);
+      
+      res.status(200).send(response);
     } catch (error) {
-      console.error("Error fetching choices:", error);
+      console.error("❌ 선택지 조회 에러:", error);
       res.status(500).json({ message: "선택지 조회에 실패했습니다." });
     }
   });

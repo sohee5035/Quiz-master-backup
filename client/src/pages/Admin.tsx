@@ -707,8 +707,8 @@ function ManageQuestionsCard() {
     // MCQ 문제의 경우 선택지 로드
     if (question.type === "MCQ") {
       try {
-        console.log(`선택지 로드 시도: /api/questions/${question.id}/choices`);
-        const response = await fetch(`/api/questions/${question.id}/choices`);
+        console.log(`선택지 로드 시도: /api/admin/questions/${question.id}/choices`);
+        const response = await fetch(`/api/admin/questions/${question.id}/choices`);
         console.log("응답 상태:", response.status, response.statusText);
         
         if (response.ok) {
