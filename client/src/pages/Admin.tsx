@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Eye, Calendar, BarChart3, Trash2, Globe } from "lucide-react";
+import { Eye, Calendar, BarChart3, Trash2, Globe, MessageSquare } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { Badge } from "@/components/ui/badge";
 
@@ -483,6 +483,101 @@ function VisitorStatsCard() {
   );
 }
 
+// 댓글 관리 컴포넌트
+function CommentManagementCard() {
+  const { data: commentsData, isLoading } = useQuery<{
+    success: boolean;
+    comments: any[];
+    total: number;
+  }>({
+    queryKey: ['/api/comments'],
+    refetchInterval: 30000, // 30초마다 새로고침
+  });
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MessageSquare className="h-5 w-5" />
+            댓글 관리
+          </CardTitle>
+          <CardDescription>사용자들이 남긴 댓글을 IP와 함께 확인할 수 있습니다.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8 text-gray-500 flex flex-col items-center gap-3">
+            <Spinner size="md" className="text-green-500" />
+            댓글 로딩 중...
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const { comments = [], total = 0 } = commentsData || {};
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <MessageSquare className="h-5 w-5" />
+          댓글 관리
+        </CardTitle>
+        <CardDescription>사용자들이 남긴 댓글을 IP와 함께 확인할 수 있습니다. (총 {total}개)</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4 max-h-96 overflow-y-auto">
+          {comments.length > 0 ? (
+            comments.map((comment: any, index: number) => (
+              <div
+                key={comment.id}
+                className="border rounded-lg p-4 space-y-3 hover:bg-gray-50"
+              >
+                <div className="flex justify-between items-start gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                        #{index + 1}
+                      </Badge>
+                      <span className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">
+                        IP: {comment.ipAddress}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {comment.createdAt 
+                          ? new Date(comment.createdAt).toLocaleString('ko-KR')
+                          : '방금 전'
+                        }
+                      </span>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-3 mb-2">
+                      <div className="text-sm text-gray-900 whitespace-pre-wrap">
+                        {comment.content}
+                      </div>
+                    </div>
+                    {comment.userAgent && (
+                      <div className="text-xs text-gray-500 truncate">
+                        브라우저: {comment.userAgent}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              아직 등록된 댓글이 없습니다.
+            </div>
+          )}
+        </div>
+        
+        <div className="text-xs text-gray-500 text-center mt-4 pt-4 border-t">
+          * 30초마다 자동 업데이트됩니다
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 // 문제 관리 컴포넌트
 function ManageQuestionsCard() {
   const { toast } = useToast();
@@ -891,8 +986,9 @@ export default function Admin() {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="stats" className="w-full">
-              <TabsList className="grid w-full grid-cols-5">
+              <TabsList className="grid w-full grid-cols-6">
                 <TabsTrigger value="stats">조회수 통계</TabsTrigger>
+                <TabsTrigger value="comments">댓글 관리</TabsTrigger>
                 <TabsTrigger value="manage">문제 관리</TabsTrigger>
                 <TabsTrigger value="ox">OX 문제</TabsTrigger>
                 <TabsTrigger value="mcq">사지선다</TabsTrigger>
@@ -904,6 +1000,10 @@ export default function Admin() {
                 <VisitorStatsCard />
                 <ModeStatsCard />
                 <QuestionStatsCard />
+              </TabsContent>
+
+              <TabsContent value="comments" className="space-y-4">
+                <CommentManagementCard />
               </TabsContent>
 
               <TabsContent value="manage" className="space-y-4">
