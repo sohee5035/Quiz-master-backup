@@ -18,7 +18,7 @@ export default function WangsoheeTimerSetup({ onStart, onBack }: WangsoheeTimerS
       <Card className="mt-8 shadow-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">👑⚡ 왕소희 타이머 모드 설정 ⚡👑</CardTitle>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">왕소희님이 만든 문제를 몇 개 풀어볼까요?</p>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">조금 어렵게 내봤습니다. 화이팅❤️‍🔥</p>
           <p className="text-sm text-gray-500 dark:text-gray-400">각 문제마다 10초의 제한 시간이 있습니다</p>
         </CardHeader>
         <CardContent className="p-8">
