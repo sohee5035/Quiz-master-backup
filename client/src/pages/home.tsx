@@ -36,7 +36,8 @@ export default function Home({ onStart, onStartTimer, onStartDifficult, onStartW
               <div className="text-sm text-gray-800 dark:text-yellow-200 space-y-1">
                 <div>기본 문제는 외환사업부 410 연습문제가 나옵니다!</div>
                 <div>제작문제는 본선 범위에 맞는 문제로 구성했습니다.<br/>(업데이트 예정)</div>
-                <div className="text-sm font-bold">💡 문의사항이나 의견은 하단 댓글로 남겨주세요 😊</div>
+                <div>🌙 맨 위 Dark 버튼을 눌러보세요</div>
+                <div className="text-sm font-bold">문의사항이나 의견은 하단 댓글로 남겨주세요 😊</div>
               </div>
             </div>
           </div>
