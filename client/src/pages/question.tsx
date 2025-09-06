@@ -34,7 +34,7 @@ export default function Question({ sessionData, onAnswer, onNext, answerResult, 
 
   const getChoiceButtonClass = (choiceId: string, isCorrect: boolean) => {
     if (!answerResult) {
-      return "w-full text-left p-4 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-yellow-300 hover:bg-yellow-50 dark:hover:bg-yellow-900/30 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white";
+      return "w-full text-left p-3 sm:p-4 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-yellow-300 hover:bg-yellow-50 dark:hover:bg-yellow-900/30 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm sm:text-base min-h-[44px]";
     }
 
     // 내가 선택한 답
@@ -54,7 +54,7 @@ export default function Question({ sessionData, onAnswer, onNext, answerResult, 
 
   const getOXButtonClass = (value: boolean) => {
     if (!answerResult) {
-      return "w-full text-left p-4 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-yellow-300 hover:bg-yellow-50 dark:hover:bg-yellow-900/30 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white";
+      return "w-full text-left p-3 sm:p-4 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-yellow-300 hover:bg-yellow-50 dark:hover:bg-yellow-900/30 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm sm:text-base min-h-[44px]";
     }
 
     const isCorrect = value === question.answer;
@@ -75,13 +75,13 @@ export default function Question({ sessionData, onAnswer, onNext, answerResult, 
   };
 
   return (
-    <div className="container mx-auto max-w-2xl p-6">
+    <div className="container mx-auto max-w-2xl p-3 sm:p-6">
       {/* Progress Bar */}
-      <Card className="mb-6 shadow-sm bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-        <CardContent className="p-6">
+      <Card className="mb-4 sm:mb-6 shadow-sm bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+        <CardContent className="p-3 sm:p-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">진행상황</span>
-            <span className="text-sm font-medium text-gray-900 dark:text-white" data-testid="text-progress">
+            <span className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">진행상황</span>
+            <span className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white" data-testid="text-progress">
               {currentQuestion} / {totalQuestions}
             </span>
           </div>
@@ -91,22 +91,22 @@ export default function Question({ sessionData, onAnswer, onNext, answerResult, 
 
       {/* Feedback Banner */}
       {answerResult && (
-        <div className="mb-6" data-testid="feedback-banner">
+        <div className="mb-4 sm:mb-6" data-testid="feedback-banner">
           {answerResult.isCorrect ? (
-            <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 rounded-xl p-4">
+            <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 rounded-xl p-3 sm:p-4">
               <div className="flex items-center">
-                <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0" />
-                <div className="ml-3">
-                  <p className="text-green-800 dark:text-green-200 font-medium">정답입니다</p>
+                <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 dark:text-green-400 flex-shrink-0" />
+                <div className="ml-2 sm:ml-3">
+                  <p className="text-green-800 dark:text-green-200 font-medium text-sm sm:text-base">정답입니다</p>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-xl p-4">
+            <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-xl p-3 sm:p-4">
               <div className="flex items-center">
-                <XCircle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0" />
-                <div className="ml-3">
-                  <p className="text-red-800 dark:text-red-200 font-medium">오답입니다</p>
+                <XCircle className="h-4 w-4 sm:h-5 sm:w-5 text-red-600 dark:text-red-400 flex-shrink-0" />
+                <div className="ml-2 sm:ml-3">
+                  <p className="text-red-800 dark:text-red-200 font-medium text-sm sm:text-base">오답입니다</p>
                 </div>
               </div>
             </div>
@@ -115,17 +115,17 @@ export default function Question({ sessionData, onAnswer, onNext, answerResult, 
       )}
 
       {/* Question Card */}
-      <Card className="mb-6 shadow-sm bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-        <CardContent className="p-6">
-          <div className="mb-6">
-            <p className="text-lg text-gray-900 dark:text-white leading-relaxed" data-testid="text-question-stem">
+      <Card className="mb-4 sm:mb-6 shadow-sm bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+        <CardContent className="p-4 sm:p-6">
+          <div className="mb-4 sm:mb-6">
+            <p className="text-base sm:text-lg text-gray-900 dark:text-white leading-relaxed" data-testid="text-question-stem">
               {question.stem}
             </p>
           </div>
 
           {/* MCQ Options */}
           {question.type === "MCQ" && question.choices && (
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {question.choices.map((choice) => (
                 <button
                   key={choice.id}
@@ -153,14 +153,14 @@ export default function Question({ sessionData, onAnswer, onNext, answerResult, 
 
           {/* OX Options */}
           {question.type === "OX" && (
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               <button
                 onClick={() => handleAnswerSelect(true)}
                 disabled={!!answerResult}
                 className={getOXButtonClass(true)}
                 data-testid="button-ox-true"
               >
-                <span className={`font-medium text-xl ${
+                <span className={`font-medium text-lg sm:text-xl ${
                   answerResult && selectedAnswer === true && question.answer === true
                     ? "text-green-700 dark:text-green-200"
                     : answerResult && selectedAnswer === true && question.answer !== true
@@ -179,7 +179,7 @@ export default function Question({ sessionData, onAnswer, onNext, answerResult, 
                 className={getOXButtonClass(false)}
                 data-testid="button-ox-false"
               >
-                <span className={`font-medium text-xl ${
+                <span className={`font-medium text-lg sm:text-xl ${
                   answerResult && selectedAnswer === false && question.answer === false
                     ? "text-green-700 dark:text-green-200"
                     : answerResult && selectedAnswer === false && question.answer !== false
@@ -199,11 +199,11 @@ export default function Question({ sessionData, onAnswer, onNext, answerResult, 
 
       {/* Explanation Box */}
       {answerResult && (
-        <Card className="mb-6 bg-gray-50 dark:bg-gray-800 shadow-sm border-gray-200 dark:border-gray-700">
-          <CardContent className="p-6">
-            <div className="font-semibold text-gray-900 dark:text-white mb-3">해설</div>
+        <Card className="mb-4 sm:mb-6 bg-gray-50 dark:bg-gray-800 shadow-sm border-gray-200 dark:border-gray-700">
+          <CardContent className="p-4 sm:p-6">
+            <div className="font-semibold text-gray-900 dark:text-white mb-3 text-sm sm:text-base">해설</div>
             <div 
-              className="text-gray-700 dark:text-gray-300 leading-relaxed"
+              className="text-gray-700 dark:text-gray-300 leading-relaxed text-sm sm:text-base"
               style={{ whiteSpace: 'pre-wrap' }}
               data-testid="text-explanation"
             >
@@ -218,7 +218,7 @@ export default function Question({ sessionData, onAnswer, onNext, answerResult, 
         <Button
           onClick={onNext}
           disabled={isLoading}
-          className="w-full bg-yellow-500 hover:bg-yellow-600 dark:bg-yellow-700 dark:hover:bg-yellow-800 disabled:bg-gray-400 disabled:dark:bg-gray-600 text-white font-semibold py-4 px-6 rounded-xl transition-colors duration-200 shadow-sm flex items-center justify-center gap-2"
+          className="w-full bg-yellow-500 hover:bg-yellow-600 dark:bg-yellow-700 dark:hover:bg-yellow-800 disabled:bg-gray-400 disabled:dark:bg-gray-600 text-white font-semibold py-3 sm:py-4 px-4 sm:px-6 rounded-xl transition-colors duration-200 shadow-sm flex items-center justify-center gap-2 text-sm sm:text-base min-h-[44px]"
           data-testid="button-next-question"
         >
           {isLoading && <Spinner size="sm" className="text-white" />}
