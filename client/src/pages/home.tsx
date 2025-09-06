@@ -35,8 +35,8 @@ export default function Home({ onStart, onStartTimer, onStartDifficult, onStartW
               <div className="text-sm text-gray-700 dark:text-yellow-200 mb-1">📅 본선 25.09.12 (금) 16:00</div>
               <div className="text-sm text-gray-800 dark:text-yellow-200 space-y-1">
                 <div>기본 문제는 외환사업부 410 연습문제가 나옵니다!</div>
-                <div>제작문제는 본선 범위에 맞는 문제로 구성했습니다. (업데이트 예정)</div>
-                <div className="text-xs font-bold">💡 문의사항이나 의견은 하단 댓글로 남겨주세요 😊</div>
+                <div>제작문제는 본선 범위에 맞는 문제로 구성했습니다.<br/>(업데이트 예정)</div>
+                <div className="text-sm font-bold">💡 문의사항이나 의견은 하단 댓글로 남겨주세요 😊</div>
               </div>
             </div>
           </div>
