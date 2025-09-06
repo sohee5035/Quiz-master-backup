@@ -109,6 +109,15 @@
     @apply font-sans antialiased bg-background text-foreground;
     font-family: 'Noto Sans KR', 'Open Sans', sans-serif;
   }
+  
+  /* 다크모드 강제 적용 */
+  .dark body {
+    background-color: #000000 !important;
+  }
+  
+  .dark {
+    background-color: #000000 !important;
+  }
 }
 
 /* 반짝임 애니메이션 */
