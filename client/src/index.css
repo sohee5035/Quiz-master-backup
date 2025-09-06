@@ -118,6 +118,10 @@
   .dark {
     background-color: #000000 !important;
   }
+  
+  .dark .container {
+    background-color: #000000 !important;
+  }
 }
 
 /* 반짝임 애니메이션 */
