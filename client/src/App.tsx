@@ -146,7 +146,7 @@ function AppContent() {
       
       toast({
         title: "왕소희 타이머 모드 시작!",
-        description: "왕소희님이 만든 문제들을 타이머와 함께 풀어보세요! 👑⚡",
+        description: "조금 어렵게 내봤습니다. 화이팅❤️‍🔥",
       });
     },
     onError: (error) => {
@@ -169,7 +169,7 @@ function AppContent() {
       
       toast({
         title: "왕소희 제작 문제 도전!",
-        description: "왕소희님이 직접 만든 특별한 문제들을 풀어보세요! 👑",
+        description: "조금 어렵게 내봤습니다. 화이팅❤️‍🔥",
       });
     },
     onError: (error) => {
