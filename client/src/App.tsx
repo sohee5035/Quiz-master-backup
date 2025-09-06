@@ -419,11 +419,11 @@ function AppContent() {
               </button>
               <button
                 onClick={toggleDarkMode}
-                className="text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100 px-2 py-1 rounded transition-colors"
+                className="text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100 px-3 py-1 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 transition-colors text-xs font-medium"
                 data-testid="toggle-dark-mode"
                 title={isDarkMode ? "라이트 모드로 전환" : "다크 모드로 전환"}
               >
-                {isDarkMode ? "☀️" : "🌙"}
+                {isDarkMode ? "Light" : "Dark"}
               </button>
             </div>
           </div>

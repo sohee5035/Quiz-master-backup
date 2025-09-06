@@ -34,27 +34,27 @@ export default function Question({ sessionData, onAnswer, onNext, answerResult, 
 
   const getChoiceButtonClass = (choiceId: string, isCorrect: boolean) => {
     if (!answerResult) {
-      return "w-full text-left p-4 rounded-lg border border-gray-200 hover:border-yellow-300 hover:bg-yellow-50 transition-all duration-200";
+      return "w-full text-left p-4 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-yellow-300 hover:bg-yellow-50 dark:hover:bg-yellow-900/30 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white";
     }
 
     // 내가 선택한 답
     if (selectedAnswer === choiceId) {
       return isCorrect
-        ? "w-full text-left p-4 rounded-lg border border-green-200 bg-green-50"
-        : "w-full text-left p-4 rounded-lg border border-red-200 bg-red-50";
+        ? "w-full text-left p-4 rounded-lg border border-green-200 dark:border-green-700 bg-green-50 dark:bg-green-900/30 text-gray-900 dark:text-green-100"
+        : "w-full text-left p-4 rounded-lg border border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-900/30 text-gray-900 dark:text-red-100";
     }
 
     // 정답인 선택지는 항상 초록색으로 표시
     if (isCorrect) {
-      return "w-full text-left p-4 rounded-lg border-4 border-green-500 bg-green-50";
+      return "w-full text-left p-4 rounded-lg border-4 border-green-500 dark:border-green-400 bg-green-50 dark:bg-green-900/30 text-gray-900 dark:text-green-100";
     }
 
-    return "w-full text-left p-4 rounded-lg border border-gray-200 opacity-50";
+    return "w-full text-left p-4 rounded-lg border border-gray-200 dark:border-gray-600 opacity-50 bg-white dark:bg-gray-800 text-gray-900 dark:text-white";
   };
 
   const getOXButtonClass = (value: boolean) => {
     if (!answerResult) {
-      return "w-full text-left p-4 rounded-lg border border-gray-200 hover:border-yellow-300 hover:bg-yellow-50 transition-all duration-200";
+      return "w-full text-left p-4 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-yellow-300 hover:bg-yellow-50 dark:hover:bg-yellow-900/30 transition-all duration-200 bg-white dark:bg-gray-800 text-gray-900 dark:text-white";
     }
 
     const isCorrect = value === question.answer;
@@ -62,26 +62,26 @@ export default function Question({ sessionData, onAnswer, onNext, answerResult, 
     // 내가 선택한 답
     if (selectedAnswer === value) {
       return isCorrect
-        ? "w-full text-left p-4 rounded-lg border border-green-200 bg-green-50"
-        : "w-full text-left p-4 rounded-lg border border-red-200 bg-red-50";
+        ? "w-full text-left p-4 rounded-lg border border-green-200 dark:border-green-700 bg-green-50 dark:bg-green-900/30 text-gray-900 dark:text-green-100"
+        : "w-full text-left p-4 rounded-lg border border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-900/30 text-gray-900 dark:text-red-100";
     }
 
     // 정답은 항상 초록색으로 표시
     if (isCorrect) {
-      return "w-full text-left p-4 rounded-lg border-4 border-green-500 bg-green-50";
+      return "w-full text-left p-4 rounded-lg border-4 border-green-500 dark:border-green-400 bg-green-50 dark:bg-green-900/30 text-gray-900 dark:text-green-100";
     }
 
-    return "w-full text-left p-4 rounded-lg border border-gray-200 opacity-50";
+    return "w-full text-left p-4 rounded-lg border border-gray-200 dark:border-gray-600 opacity-50 bg-white dark:bg-gray-800 text-gray-900 dark:text-white";
   };
 
   return (
     <div className="container mx-auto max-w-2xl p-6">
       {/* Progress Bar */}
-      <Card className="mb-6 shadow-sm">
+      <Card className="mb-6 shadow-sm bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-600">진행상황</span>
-            <span className="text-sm font-medium text-gray-900" data-testid="text-progress">
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">진행상황</span>
+            <span className="text-sm font-medium text-gray-900 dark:text-white" data-testid="text-progress">
               {currentQuestion} / {totalQuestions}
             </span>
           </div>
@@ -93,20 +93,20 @@ export default function Question({ sessionData, onAnswer, onNext, answerResult, 
       {answerResult && (
         <div className="mb-6" data-testid="feedback-banner">
           {answerResult.isCorrect ? (
-            <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+            <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 rounded-xl p-4">
               <div className="flex items-center">
-                <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
+                <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0" />
                 <div className="ml-3">
-                  <p className="text-green-800 font-medium">정답입니다</p>
+                  <p className="text-green-800 dark:text-green-200 font-medium">정답입니다</p>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+            <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-xl p-4">
               <div className="flex items-center">
-                <XCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
+                <XCircle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0" />
                 <div className="ml-3">
-                  <p className="text-red-800 font-medium">오답입니다</p>
+                  <p className="text-red-800 dark:text-red-200 font-medium">오답입니다</p>
                 </div>
               </div>
             </div>
@@ -115,10 +115,10 @@ export default function Question({ sessionData, onAnswer, onNext, answerResult, 
       )}
 
       {/* Question Card */}
-      <Card className="mb-6 shadow-sm">
+      <Card className="mb-6 shadow-sm bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <CardContent className="p-6">
           <div className="mb-6">
-            <p className="text-lg text-gray-900 leading-relaxed" data-testid="text-question-stem">
+            <p className="text-lg text-gray-900 dark:text-white leading-relaxed" data-testid="text-question-stem">
               {question.stem}
             </p>
           </div>
@@ -136,10 +136,10 @@ export default function Question({ sessionData, onAnswer, onNext, answerResult, 
                 >
                   <span className={`font-medium ${
                     answerResult && selectedAnswer === choice.id && choice.isCorrect
-                      ? "text-green-700"
+                      ? "text-green-700 dark:text-green-200"
                       : answerResult && selectedAnswer === choice.id && !choice.isCorrect
-                      ? "text-red-700"
-                      : "text-gray-900"
+                      ? "text-red-700 dark:text-red-200"
+                      : "text-gray-900 dark:text-white"
                   }`}>
                     {choice.content}
                   </span>
@@ -162,10 +162,10 @@ export default function Question({ sessionData, onAnswer, onNext, answerResult, 
               >
                 <span className={`font-medium text-xl ${
                   answerResult && selectedAnswer === true && question.answer === true
-                    ? "text-green-700"
+                    ? "text-green-700 dark:text-green-200"
                     : answerResult && selectedAnswer === true && question.answer !== true
-                    ? "text-red-700"
-                    : "text-gray-900"
+                    ? "text-red-700 dark:text-red-200"
+                    : "text-gray-900 dark:text-white"
                 }`}>
                   O (맞음)
                 </span>
@@ -181,10 +181,10 @@ export default function Question({ sessionData, onAnswer, onNext, answerResult, 
               >
                 <span className={`font-medium text-xl ${
                   answerResult && selectedAnswer === false && question.answer === false
-                    ? "text-green-700"
+                    ? "text-green-700 dark:text-green-200"
                     : answerResult && selectedAnswer === false && question.answer !== false
-                    ? "text-red-700"
-                    : "text-gray-900"
+                    ? "text-red-700 dark:text-red-200"
+                    : "text-gray-900 dark:text-white"
                 }`}>
                   X (틀림)
                 </span>
@@ -199,11 +199,11 @@ export default function Question({ sessionData, onAnswer, onNext, answerResult, 
 
       {/* Explanation Box */}
       {answerResult && (
-        <Card className="mb-6 bg-gray-50 shadow-sm">
+        <Card className="mb-6 bg-gray-50 dark:bg-gray-800 shadow-sm border-gray-200 dark:border-gray-700">
           <CardContent className="p-6">
-            <div className="font-semibold text-gray-900 mb-3">해설</div>
+            <div className="font-semibold text-gray-900 dark:text-white mb-3">해설</div>
             <div 
-              className="text-gray-700 leading-relaxed"
+              className="text-gray-700 dark:text-gray-300 leading-relaxed"
               style={{ whiteSpace: 'pre-wrap' }}
               data-testid="text-explanation"
             >
