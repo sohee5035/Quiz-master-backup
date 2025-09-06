@@ -218,7 +218,7 @@ export default function Question({ sessionData, onAnswer, onNext, answerResult, 
         <Button
           onClick={onNext}
           disabled={isLoading}
-          className="w-full bg-yellow-500 hover:bg-yellow-600 disabled:bg-gray-400 text-white font-semibold py-4 px-6 rounded-xl transition-colors duration-200 shadow-sm flex items-center justify-center gap-2"
+          className="w-full bg-yellow-500 hover:bg-yellow-600 dark:bg-yellow-700 dark:hover:bg-yellow-800 disabled:bg-gray-400 disabled:dark:bg-gray-600 text-white font-semibold py-4 px-6 rounded-xl transition-colors duration-200 shadow-sm flex items-center justify-center gap-2"
           data-testid="button-next-question"
         >
           {isLoading && <Spinner size="sm" className="text-white" />}

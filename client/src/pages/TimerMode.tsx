@@ -234,7 +234,7 @@ export default function TimerMode({ questionData, onAnswer, onNext, onSkip }: Ti
       {showExplanation && (
         <Button
           onClick={onNext}
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 px-6 rounded-xl transition-colors duration-200 shadow-sm"
+          className="w-full bg-blue-500 hover:bg-blue-600 dark:bg-blue-700 dark:hover:bg-blue-800 text-white font-semibold py-4 px-6 rounded-xl transition-colors duration-200 shadow-sm"
           data-testid="button-manual-next"
         >
           다음 문제로 ({explanationTimeLeft}초 후 자동 진행)
