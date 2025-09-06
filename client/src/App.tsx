@@ -46,6 +46,28 @@ function AppContent() {
     setIsDarkMode(newMode);
     localStorage.setItem('theme', newMode ? 'dark' : 'light');
     document.documentElement.classList.toggle('dark', newMode);
+    
+    // 강제로 배경색 직접 적용 💥
+    if (newMode) {
+      document.body.style.backgroundColor = '#000000';
+      document.documentElement.style.backgroundColor = '#000000';
+      // 모든 div 요소에 강제 적용
+      const allDivs = document.querySelectorAll('div');
+      allDivs.forEach(div => {
+        if (div.className.includes('container') || div.className.includes('min-h-screen')) {
+          div.style.backgroundColor = '#000000';
+        }
+      });
+    } else {
+      document.body.style.backgroundColor = '';
+      document.documentElement.style.backgroundColor = '';
+      const allDivs = document.querySelectorAll('div');
+      allDivs.forEach(div => {
+        if (div.className.includes('container') || div.className.includes('min-h-screen')) {
+          div.style.backgroundColor = '';
+        }
+      });
+    }
   };
 
   const startSessionMutation = useMutation({
