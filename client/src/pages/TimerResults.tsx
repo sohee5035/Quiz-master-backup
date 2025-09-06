@@ -137,9 +137,9 @@ export default function TimerResults({ results, onRestart, onHome }: TimerResult
 
                   {/* Explanation */}
                   {question.explanation && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                      <div className="font-semibold text-blue-700 mb-2">📖 해설</div>
-                      <div className="text-blue-800 leading-relaxed">
+                    <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+                      <div className="font-semibold text-blue-700 dark:text-blue-300 mb-2">📖 해설</div>
+                      <div className="text-blue-800 dark:text-blue-200 leading-relaxed">
                         {question.explanation}
                       </div>
                     </div>

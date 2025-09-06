@@ -16,11 +16,11 @@ export default function TimerSetup({ onStart, onBack }: TimerSetupProps) {
 
   return (
     <div className="container mx-auto max-w-2xl p-6">
-      <Card className="mt-8 shadow-lg">
+      <Card className="mt-8 shadow-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">⏰ 타이머 모드 설정</CardTitle>
-          <p className="text-gray-600 mt-2">몇 문제를 풀어볼까요?</p>
-          <p className="text-sm text-gray-500">각 문제마다 10초의 제한 시간이 있습니다</p>
+          <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">⏰ 타이머 모드 설정</CardTitle>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">몇 문제를 풀어볼까요?</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">각 문제마다 10초의 제한 시간이 있습니다</p>
         </CardHeader>
         <CardContent className="p-8">
           <div className="grid grid-cols-1 gap-4 mb-8">
@@ -42,9 +42,9 @@ export default function TimerSetup({ onStart, onBack }: TimerSetupProps) {
             ))}
           </div>
 
-          <div className="bg-yellow-50 rounded-lg border border-yellow-200 p-4 mb-6">
-            <h3 className="font-semibold text-yellow-800 mb-2">📋 타이머 모드 규칙</h3>
-            <ul className="text-sm text-yellow-700 space-y-1">
+          <div className="bg-yellow-50 dark:bg-yellow-900/30 rounded-lg border border-yellow-200 dark:border-yellow-800 p-4 mb-6">
+            <h3 className="font-semibold text-yellow-800 dark:text-yellow-200 mb-2">📋 타이머 모드 규칙</h3>
+            <ul className="text-sm text-yellow-700 dark:text-yellow-200 space-y-1">
               <li>• 각 문제마다 10초의 제한 시간</li>
               <li>• 답을 선택하면 즉시 제출</li>
               <li>• 시간 초과 시 자동으로 다음 문제</li>

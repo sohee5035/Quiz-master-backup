@@ -84,41 +84,41 @@ export default function TimerMode({ questionData, onAnswer, onNext, onSkip }: Ti
 
   const getChoiceButtonClass = (choiceId: string, isCorrect: boolean) => {
     if (!questionData.isAnswered) {
-      return "w-full text-left p-4 rounded-lg border border-gray-200 hover:border-yellow-300 hover:bg-yellow-50 transition-all duration-200 cursor-pointer";
+      return "w-full text-left p-4 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-yellow-300 hover:bg-yellow-50 dark:hover:bg-yellow-900/30 transition-all duration-200 cursor-pointer bg-white dark:bg-gray-800 text-gray-900 dark:text-white";
     }
 
     // Show results after answering
     if (questionData.userAnswer === choiceId) {
       return questionData.isCorrect
-        ? "w-full text-left p-4 rounded-lg border border-green-200 bg-green-50"
-        : "w-full text-left p-4 rounded-lg border border-red-200 bg-red-50";
+        ? "w-full text-left p-4 rounded-lg border border-green-200 dark:border-green-700 bg-green-50 dark:bg-green-900/30 text-gray-900 dark:text-green-100"
+        : "w-full text-left p-4 rounded-lg border border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-900/30 text-gray-900 dark:text-red-100";
     }
 
     if (isCorrect) {
-      return "w-full text-left p-4 rounded-lg border-4 border-green-500 bg-green-50";
+      return "w-full text-left p-4 rounded-lg border-4 border-green-500 dark:border-green-400 bg-green-50 dark:bg-green-900/30 text-gray-900 dark:text-green-100";
     }
 
-    return "w-full text-left p-4 rounded-lg border border-gray-200 opacity-50";
+    return "w-full text-left p-4 rounded-lg border border-gray-200 dark:border-gray-600 opacity-50 bg-white dark:bg-gray-800 text-gray-900 dark:text-white";
   };
 
   const getOXButtonClass = (value: boolean) => {
     if (!questionData.isAnswered) {
-      return "w-full text-left p-4 rounded-lg border border-gray-200 hover:border-yellow-300 hover:bg-yellow-50 transition-all duration-200 cursor-pointer";
+      return "w-full text-left p-4 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-yellow-300 hover:bg-yellow-50 dark:hover:bg-yellow-900/30 transition-all duration-200 cursor-pointer bg-white dark:bg-gray-800 text-gray-900 dark:text-white";
     }
 
     const isCorrect = value === questionData.question.answer;
 
     if (questionData.userAnswer === value) {
       return questionData.isCorrect
-        ? "w-full text-left p-4 rounded-lg border border-green-200 bg-green-50"
-        : "w-full text-left p-4 rounded-lg border border-red-200 bg-red-50";
+        ? "w-full text-left p-4 rounded-lg border border-green-200 dark:border-green-700 bg-green-50 dark:bg-green-900/30 text-gray-900 dark:text-green-100"
+        : "w-full text-left p-4 rounded-lg border border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-900/30 text-gray-900 dark:text-red-100";
     }
 
     if (isCorrect) {
-      return "w-full text-left p-4 rounded-lg border-4 border-green-500 bg-green-50";
+      return "w-full text-left p-4 rounded-lg border-4 border-green-500 dark:border-green-400 bg-green-50 dark:bg-green-900/30 text-gray-900 dark:text-green-100";
     }
 
-    return "w-full text-left p-4 rounded-lg border border-gray-200 opacity-50";
+    return "w-full text-left p-4 rounded-lg border border-gray-200 dark:border-gray-600 opacity-50 bg-white dark:bg-gray-800 text-gray-900 dark:text-white";
   };
 
   const timerColor = timeLeft <= 3 ? "text-red-500" : timeLeft <= 5 ? "text-orange-500" : "text-green-500";
@@ -127,11 +127,11 @@ export default function TimerMode({ questionData, onAnswer, onNext, onSkip }: Ti
     <div className="container mx-auto max-w-2xl p-6">
 
       {/* Progress Bar */}
-      <Card className="mb-6 shadow-sm">
+      <Card className="mb-6 shadow-sm bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-600">진행상황</span>
-            <span className="text-sm font-medium text-gray-600">
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">진행상황</span>
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
               {questionData.currentQuestion} / {questionData.totalQuestions}
             </span>
           </div>
@@ -140,28 +140,28 @@ export default function TimerMode({ questionData, onAnswer, onNext, onSkip }: Ti
       </Card>
 
       {/* Question */}
-      <Card className="mb-6 shadow-sm">
+      <Card className="mb-6 shadow-sm bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <CardContent className="p-6">
           <div className="flex justify-between items-center mb-4">
-            <span className="inline-block px-2 py-1 text-xs font-semibold text-gray-600 bg-gray-100 rounded">
+            <span className="inline-block px-2 py-1 text-xs font-semibold text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded">
               {questionData.question.type === "MCQ" ? "객관식" : "OX"}
             </span>
             {/* Timer inside question box */}
-            <div className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
+            <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2">
               {showExplanation ? (
                 <div className="flex items-center space-x-2">
-                  <span className="text-blue-600 font-bold text-sm">해설</span>
-                  <span className="text-blue-500 font-bold text-lg">{explanationTimeLeft}</span>
+                  <span className="text-blue-600 dark:text-blue-400 font-bold text-sm">해설</span>
+                  <span className="text-blue-500 dark:text-blue-400 font-bold text-lg">{explanationTimeLeft}</span>
                 </div>
               ) : (
                 <div className="flex items-center space-x-2">
-                  <span className="text-gray-600 font-medium text-sm">남은시간</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium text-sm">남은시간</span>
                   <span className={`font-bold text-xl ${timerColor}`}>{timeLeft}</span>
                 </div>
               )}
             </div>
           </div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4 leading-relaxed">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 leading-relaxed">
             {questionData.question.stem}
           </h2>
 
@@ -211,7 +211,7 @@ export default function TimerMode({ questionData, onAnswer, onNext, onSkip }: Ti
 
       {/* Explanation */}
       {showExplanation && questionData.explanation && (
-        <Card className="mb-6 shadow-sm border-l-4 border-blue-500 bg-blue-50">
+        <Card className="mb-6 shadow-sm border-l-4 border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/30">
           <CardContent className="p-6">
             <div className="flex items-start">
               <div className="flex-shrink-0 mr-3">
@@ -220,10 +220,10 @@ export default function TimerMode({ questionData, onAnswer, onNext, onSkip }: Ti
                 </div>
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-blue-900 mb-2">
+                <h3 className="font-semibold text-blue-900 dark:text-blue-200 mb-2">
                   {questionData.isCorrect ? "정답입니다!" : "틀렸습니다."}
                 </h3>
-                <p className="text-blue-800 leading-relaxed">{questionData.explanation}</p>
+                <p className="text-blue-800 dark:text-blue-200 leading-relaxed">{questionData.explanation}</p>
               </div>
             </div>
           </CardContent>
