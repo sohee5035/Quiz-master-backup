@@ -39,10 +39,10 @@ export function LoadingOverlay({ isLoading, text = "로딩 중...", className }:
   if (!isLoading) return null;
 
   return (
-    <div className={cn("fixed inset-0 bg-black/20 flex items-center justify-center z-50", className)}>
-      <div className="bg-white rounded-lg p-6 flex flex-col items-center space-y-4 shadow-lg">
-        <Spinner size="lg" className="text-yellow-500" />
-        <p className="text-gray-700 font-medium">{text}</p>
+    <div className={cn("fixed inset-0 bg-black/20 dark:bg-black/40 flex items-center justify-center z-50", className)}>
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 flex flex-col items-center space-y-4 shadow-lg border border-gray-200 dark:border-gray-700">
+        <Spinner size="lg" className="text-yellow-500 dark:text-yellow-400" />
+        <p className="text-gray-700 dark:text-gray-200 font-medium">{text}</p>
       </div>
     </div>
   );
