@@ -110,25 +110,9 @@
     font-family: 'Noto Sans KR', 'Open Sans', sans-serif;
   }
   
-  /* 다크모드 강제 적용 - 핵폭탄급 */
+  /* 다크모드 깔끔한 적용 */
   .dark body {
-    background-color: #000000 !important;
-  }
-  
-  .dark {
-    background-color: #000000 !important;
-  }
-  
-  .dark .container {
-    background-color: #000000 !important;
-  }
-  
-  .dark div {
-    background-color: inherit !important;
-  }
-  
-  .dark * {
-    --tw-bg-opacity: 1 !important;
+    background-color: #111827 !important;
   }
 }
 

@@ -13,7 +13,7 @@ interface HomeProps {
 
 export default function Home({ onStart, onStartTimer, onStartDifficult, onStartWangsohee, onStartWangsoheeTimer }: HomeProps) {
   return (
-    <div className="container mx-auto max-w-6xl p-4 bg-transparent dark:bg-black min-h-screen">
+    <div className="container mx-auto max-w-6xl p-4">
       <Card className="mt-4 shadow-sm bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <CardContent className="p-6">
           {/* 간소화된 헤더 */}
