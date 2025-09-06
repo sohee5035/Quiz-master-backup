@@ -19,11 +19,18 @@ export default function Home({ onStart, onStartTimer, onStartDifficult, onStartW
           {/* 간소화된 헤더 */}
           <div className="text-center mb-6">
             <div className="flex items-center justify-center gap-4 mb-4">
-              <img 
-                src={mascotImage} 
-                alt="KB 외환 마스터 캐릭터" 
-                className="w-20 h-20 rounded-full bg-orange-50 dark:bg-orange-900/30 p-1"
-              />
+              <div className="mascot-container">
+                <img 
+                  src={mascotImage} 
+                  alt="KB 외환 마스터 캐릭터" 
+                  className="w-20 h-20 rounded-full bg-orange-50 dark:bg-orange-900/30 p-1"
+                />
+                <span className="sparkle" style={{top: '-5px', left: '-5px'}}>✨</span>
+                <span className="sparkle" style={{top: '-8px', right: '-8px'}}>⭐</span>
+                <span className="sparkle" style={{bottom: '-5px', left: '-3px'}}>💫</span>
+                <span className="sparkle" style={{bottom: '-8px', right: '-5px'}}>✨</span>
+                <span className="sparkle" style={{top: '15px', left: '-12px'}}>🌟</span>
+              </div>
               <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">🏆 KB 외환 마스터 👑</h1>
             </div>
           </div>
