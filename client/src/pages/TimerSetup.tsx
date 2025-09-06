@@ -8,10 +8,10 @@ interface TimerSetupProps {
 
 export default function TimerSetup({ onStart, onBack }: TimerSetupProps) {
   const questionOptions = [
-    { count: 10, label: "10문제", description: "빠른 연습", color: "bg-green-500 hover:bg-green-600" },
-    { count: 30, label: "30문제", description: "적당한 분량", color: "bg-blue-500 hover:bg-blue-600" },
-    { count: 50, label: "50문제", description: "충분한 연습", color: "bg-orange-500 hover:bg-orange-600" },
-    { count: 100, label: "100문제", description: "전체 문제", color: "bg-red-500 hover:bg-red-600" },
+    { count: 10, label: "10문제", description: "빠른 연습", color: "bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700" },
+    { count: 30, label: "30문제", description: "적당한 분량", color: "bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700" },
+    { count: 50, label: "50문제", description: "충분한 연습", color: "bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700" },
+    { count: 100, label: "100문제", description: "전체 문제", color: "bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700" },
   ];
 
   return (

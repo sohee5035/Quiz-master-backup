@@ -66,8 +66,8 @@ export default function TimerResults({ results, onRestart, onHome }: TimerResult
             </div>
           </div>
           
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <p className="text-lg font-semibold text-gray-800">
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6">
+            <p className="text-lg font-semibold text-gray-800 dark:text-gray-200">
               {getScoreMessage(Number(accuracy))}
             </p>
           </div>
