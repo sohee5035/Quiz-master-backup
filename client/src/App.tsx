@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
@@ -27,7 +27,26 @@ function AppContent() {
   const [timerQuestions, setTimerQuestions] = useState<TimerQuestionData[]>([]);
   const [currentTimerIndex, setCurrentTimerIndex] = useState(0);
   const [timerResults, setTimerResults] = useState<TimerResultsData | null>(null);
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
   const { toast } = useToast();
+
+  // 다크모드 초기화 및 localStorage 연동
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const shouldUseDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+    
+    setIsDarkMode(shouldUseDark);
+    document.documentElement.classList.toggle('dark', shouldUseDark);
+  }, []);
+
+  // 다크모드 토글 함수
+  const toggleDarkMode = () => {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    localStorage.setItem('theme', newMode ? 'dark' : 'light');
+    document.documentElement.classList.toggle('dark', newMode);
+  };
 
   const startSessionMutation = useMutation({
     mutationFn: ({ questionCount, difficulty, mode }: { questionCount?: number; difficulty?: number; mode?: string }) => 
@@ -377,26 +396,34 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       {/* 상단 네비게이션 */}
-      <nav className="bg-white shadow-sm border-b">
+      <nav className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-4xl mx-auto px-4 py-3">
           <div className="flex justify-between items-center">
-            <h1 className="text-xl font-bold">🏆 KB 외환 마스터 👑</h1>
-            <div className="space-x-4">
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">🏆 KB 외환 마스터 👑</h1>
+            <div className="flex items-center space-x-4">
               <button
                 onClick={handleHome}
-                className="text-yellow-600 hover:text-yellow-800"
+                className="text-yellow-600 hover:text-yellow-800 dark:text-yellow-400 dark:hover:text-yellow-300"
                 data-testid="nav-home"
               >
                 홈
               </button>
               <button
                 onClick={handleAdmin}
-                className="text-gray-600 hover:text-gray-800"
+                className="text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100"
                 data-testid="nav-admin"
               >
                 관리자
+              </button>
+              <button
+                onClick={toggleDarkMode}
+                className="text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100 px-2 py-1 rounded transition-colors"
+                data-testid="toggle-dark-mode"
+                title={isDarkMode ? "라이트 모드로 전환" : "다크 모드로 전환"}
+              >
+                {isDarkMode ? "☀️" : "🌙"}
               </button>
             </div>
           </div>

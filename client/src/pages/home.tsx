@@ -14,7 +14,7 @@ interface HomeProps {
 export default function Home({ onStart, onStartTimer, onStartDifficult, onStartWangsohee, onStartWangsoheeTimer }: HomeProps) {
   return (
     <div className="container mx-auto max-w-6xl p-4">
-      <Card className="mt-4 shadow-sm">
+      <Card className="mt-4 shadow-sm bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <CardContent className="p-6">
           {/* 간소화된 헤더 */}
           <div className="text-center mb-6">
@@ -22,18 +22,18 @@ export default function Home({ onStart, onStartTimer, onStartDifficult, onStartW
               <img 
                 src={mascotImage} 
                 alt="KB 외환 마스터 캐릭터" 
-                className="w-20 h-20 rounded-full bg-orange-50 p-1"
+                className="w-20 h-20 rounded-full bg-orange-50 dark:bg-orange-900/30 p-1"
               />
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">🏆 KB 외환 마스터 👑</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">🏆 KB 외환 마스터 👑</h1>
             </div>
           </div>
 
           {/* 간소화된 안내 박스 */}
-          <div className="bg-yellow-50 rounded-lg border border-yellow-200 p-4 mb-6">
+          <div className="bg-yellow-50 dark:bg-yellow-900/30 rounded-lg border border-yellow-200 dark:border-yellow-800 p-4 mb-6">
             <div className="text-center space-y-3">
-              <div className="text-base font-semibold text-gray-900 mb-2">외환 마스터가 되는 그 날까지✨</div>
-              <div className="text-sm text-gray-700 mb-1">📅 본선 25.09.12 (금) 16:00</div>
-              <div className="text-sm text-gray-800 space-y-1">
+              <div className="text-base font-semibold text-gray-900 dark:text-yellow-100 mb-2">외환 마스터가 되는 그 날까지✨</div>
+              <div className="text-sm text-gray-700 dark:text-yellow-200 mb-1">📅 본선 25.09.12 (금) 16:00</div>
+              <div className="text-sm text-gray-800 dark:text-yellow-200 space-y-1">
                 <div>기본 문제는 외환사업부 410 연습문제가 나옵니다!</div>
                 <div>제작문제는 본선 범위에 맞는 문제로 구성했습니다. (업데이트 예정)</div>
                 <div className="text-xs font-bold">💡 문의사항이나 의견은 하단 댓글로 남겨주세요 😊</div>
@@ -44,10 +44,10 @@ export default function Home({ onStart, onStartTimer, onStartDifficult, onStartW
           {/* 메인 버튼 그리드 */}
           <div className="grid lg:grid-cols-2 gap-6 mb-6">
             {/* 1. 기본 학습 모드 */}
-            <div className="bg-blue-50 rounded-xl border border-blue-200 p-5">
+            <div className="bg-blue-50 dark:bg-blue-900/30 rounded-xl border border-blue-200 dark:border-blue-800 p-5">
               <div className="text-center mb-4">
-                <h3 className="text-lg font-semibold text-blue-800 mb-2">📚 기본 학습 모드</h3>
-                <p className="text-sm text-blue-600">기본 출제 예상 문제로 학습해보세요</p>
+                <h3 className="text-lg font-semibold text-blue-800 dark:text-blue-200 mb-2">📚 기본 학습 모드</h3>
+                <p className="text-sm text-blue-600 dark:text-blue-300">기본 출제 예상 문제로 학습해보세요</p>
               </div>
               <div className="space-y-3">
                 <Button
@@ -68,10 +68,10 @@ export default function Home({ onStart, onStartTimer, onStartDifficult, onStartW
             </div>
 
             {/* 2. 왕소희 제작 문제 */}
-            <div className="bg-pink-50 rounded-xl border border-pink-200 p-5">
+            <div className="bg-pink-50 dark:bg-pink-900/30 rounded-xl border border-pink-200 dark:border-pink-800 p-5">
               <div className="text-center mb-4">
-                <h3 className="text-lg font-semibold text-pink-800 mb-2">👑 왕소희 제작 문제</h3>
-                <p className="text-sm text-pink-600">추가로 제작한 연습 문제들</p>
+                <h3 className="text-lg font-semibold text-pink-800 dark:text-pink-200 mb-2">👑 왕소희 제작 문제</h3>
+                <p className="text-sm text-pink-600 dark:text-pink-300">추가로 제작한 연습 문제들</p>
               </div>
               <div className="space-y-3">
                 <Button
@@ -95,10 +95,10 @@ export default function Home({ onStart, onStartTimer, onStartDifficult, onStartW
           {/* 하단 버튼 그룹 */}
           <div className="grid lg:grid-cols-2 gap-6">
             {/* 3. 집중 공략 모드 */}
-            <div className="bg-purple-50 rounded-xl border border-purple-200 p-5">
+            <div className="bg-purple-50 dark:bg-purple-900/30 rounded-xl border border-purple-200 dark:border-purple-800 p-5">
               <div className="text-center mb-4">
-                <h3 className="text-lg font-semibold text-purple-800 mb-2">🎯 집중 공략 모드</h3>
-                <p className="text-sm text-purple-600">약점 보완과 빠른 복습용</p>
+                <h3 className="text-lg font-semibold text-purple-800 dark:text-purple-200 mb-2">🎯 집중 공략 모드</h3>
+                <p className="text-sm text-purple-600 dark:text-purple-300">약점 보완과 빠른 복습용</p>
               </div>
               <div className="space-y-3">
                 <Button
@@ -119,10 +119,10 @@ export default function Home({ onStart, onStartTimer, onStartDifficult, onStartW
             </div>
 
             {/* 4. 난이도별 연습 */}
-            <div className="bg-gray-50 rounded-xl border border-gray-200 p-5">
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-600 p-5">
               <div className="text-center mb-4">
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">⚡ 난이도별 연습</h3>
-                <p className="text-sm text-gray-600">난이도를 선택해서 집중 학습</p>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">⚡ 난이도별 연습</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">난이도를 선택해서 집중 학습</p>
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <Button
