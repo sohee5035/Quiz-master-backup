@@ -75,14 +75,14 @@ export default function TimerResults({ results, onRestart, onHome }: TimerResult
           <div className="flex justify-center space-x-4">
             <Button 
               onClick={onRestart}
-              className="bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white px-6 py-3"
+              className="bg-red-500 hover:bg-red-600 dark:bg-red-700 dark:hover:bg-red-800 text-white px-6 py-3"
               data-testid="button-restart-timer"
             >
               ⏰ 타이머 모드 다시하기
             </Button>
             <Button 
               onClick={onHome}
-              className="bg-yellow-500 hover:bg-yellow-600 dark:bg-yellow-600 dark:hover:bg-yellow-700 text-white px-6 py-3"
+              className="bg-yellow-500 hover:bg-yellow-600 dark:bg-yellow-700 dark:hover:bg-yellow-800 text-white px-6 py-3"
               data-testid="button-home"
             >
               🏠 홈으로

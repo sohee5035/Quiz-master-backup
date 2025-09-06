@@ -8,9 +8,9 @@ interface WangsoheeTimerSetupProps {
 
 export default function WangsoheeTimerSetup({ onStart, onBack }: WangsoheeTimerSetupProps) {
   const questionOptions = [
-    { count: 10, label: "10문제", description: "빠른 연습", color: "bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700" },
-    { count: 30, label: "30문제", description: "적당한 분량", color: "bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700" },
-    { count: 50, label: "50문제", description: "충분한 연습", color: "bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700" },
+    { count: 10, label: "10문제", description: "빠른 연습", color: "bg-green-500 hover:bg-green-600 dark:bg-green-700 dark:hover:bg-green-800" },
+    { count: 30, label: "30문제", description: "적당한 분량", color: "bg-blue-500 hover:bg-blue-600 dark:bg-blue-700 dark:hover:bg-blue-800" },
+    { count: 50, label: "50문제", description: "충분한 연습", color: "bg-orange-500 hover:bg-orange-600 dark:bg-orange-700 dark:hover:bg-orange-800" },
   ];
 
   return (
