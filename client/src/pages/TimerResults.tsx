@@ -75,14 +75,14 @@ export default function TimerResults({ results, onRestart, onHome }: TimerResult
           <div className="flex justify-center space-x-4">
             <Button 
               onClick={onRestart}
-              className="bg-red-500 hover:bg-red-600 text-white px-6 py-3"
+              className="bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white px-6 py-3"
               data-testid="button-restart-timer"
             >
               ⏰ 타이머 모드 다시하기
             </Button>
             <Button 
               onClick={onHome}
-              className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3"
+              className="bg-yellow-500 hover:bg-yellow-600 dark:bg-yellow-600 dark:hover:bg-yellow-700 text-white px-6 py-3"
               data-testid="button-home"
             >
               🏠 홈으로
@@ -93,43 +93,43 @@ export default function TimerResults({ results, onRestart, onHome }: TimerResult
 
       {/* Incorrect Questions Review */}
       {incorrectCount > 0 ? (
-        <Card className="shadow-lg">
+        <Card className="shadow-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
           <CardHeader>
-            <CardTitle className="text-xl text-red-600 flex items-center">
+            <CardTitle className="text-xl text-red-600 dark:text-red-400 flex items-center">
               ❌ 틀린 문제 복습 ({incorrectCount}개)
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
               {results.incorrectQuestions.map((question, index) => (
-                <div key={question.question.id} className="border-b border-gray-200 pb-6 last:border-b-0">
+                <div key={question.question.id} className="border-b border-gray-200 dark:border-gray-600 pb-6 last:border-b-0">
                   <div className="mb-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-gray-500">
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                         문제 {question.currentQuestion} - {question.question.type === "MCQ" ? "객관식" : "OX"}
                       </span>
-                      <span className="text-sm font-medium text-red-600">
+                      <span className="text-sm font-medium text-red-600 dark:text-red-400">
                         {question.userAnswer === undefined ? "시간 초과" : "오답"}
                       </span>
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                       {question.question.stem}
                     </h3>
                   </div>
 
                   <div className="grid md:grid-cols-2 gap-4 mb-4">
                     {/* User Answer */}
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                      <div className="font-semibold text-red-700 mb-2">내 답안</div>
-                      <div className="text-red-800">
+                    <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-lg p-4">
+                      <div className="font-semibold text-red-700 dark:text-red-300 mb-2">내 답안</div>
+                      <div className="text-red-800 dark:text-red-200">
                         {getUserAnswerText(question)}
                       </div>
                     </div>
 
                     {/* Correct Answer */}
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                      <div className="font-semibold text-green-700 mb-2">정답</div>
-                      <div className="text-green-800">
+                    <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 rounded-lg p-4">
+                      <div className="font-semibold text-green-700 dark:text-green-300 mb-2">정답</div>
+                      <div className="text-green-800 dark:text-green-200">
                         {getCorrectAnswerText(question)}
                       </div>
                     </div>
@@ -150,16 +150,16 @@ export default function TimerResults({ results, onRestart, onHome }: TimerResult
           </CardContent>
         </Card>
       ) : (
-        <Card className="shadow-lg">
+        <Card className="shadow-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
           <CardHeader>
-            <CardTitle className="text-xl text-green-600 flex items-center">
+            <CardTitle className="text-xl text-green-600 dark:text-green-400 flex items-center">
               🎉 모든 문제를 정답으로 맞혔습니다!
             </CardTitle>
           </CardHeader>
           <CardContent className="text-center py-12">
             <div className="text-6xl mb-4">🎉</div>
-            <h3 className="text-2xl font-bold text-green-600 mb-2">완벽해요!</h3>
-            <p className="text-lg text-gray-600">
+            <h3 className="text-2xl font-bold text-green-600 dark:text-green-400 mb-2">완벽해요!</h3>
+            <p className="text-lg text-gray-600 dark:text-gray-400">
               모든 문제를 맞췄습니다. 정말 대단해요!
             </p>
           </CardContent>
