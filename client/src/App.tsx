@@ -15,9 +15,10 @@ import TimerMode from "./pages/TimerMode.tsx";
 import TimerResults from "./pages/TimerResults.tsx";
 import TimerSetup from "./pages/TimerSetup";
 import WangsoheeTimerSetup from "./pages/WangsoheeTimerSetup";
+import WangsoheeSetup from "./pages/WangsoheeSetup";
 import type { SessionResponse, AnswerResponse, ResultsResponse, TimerQuestionData, TimerResultsData } from "@shared/schema";
 
-type AppState = "home" | "question" | "results" | "admin" | "timer" | "timer-results" | "timer-setup" | "wangsohee-timer-setup";
+type AppState = "home" | "question" | "results" | "admin" | "timer" | "timer-results" | "timer-setup" | "wangsohee-timer-setup" | "wangsohee-setup";
 
 function AppContent() {
   const [appState, setAppState] = useState<AppState>("home");
@@ -161,7 +162,7 @@ function AppContent() {
 
   // 왕소희 제작 문제 세션 시작
   const startWangsoheeMutation = useMutation({
-    mutationFn: () => api.startSession("wangsohee"),
+    mutationFn: (questionCount: number) => api.startSession("wangsohee", questionCount || undefined),
     onSuccess: (data) => {
       setSessionData(data);
       setAnswerResult(null);
@@ -250,6 +251,14 @@ function AppContent() {
 
   const handleStartWangsoheeTimer = () => {
     setAppState("wangsohee-timer-setup");
+  };
+
+  const handleStartWangsohee = () => {
+    setAppState("wangsohee-setup");
+  };
+
+  const handleStartWangsoheeWithCount = (questionCount: number) => {
+    startWangsoheeMutation.mutate(questionCount);
   };
 
   const handleStartWangsoheeTimerWithCount = (questionCount: number) => {
@@ -435,7 +444,7 @@ function AppContent() {
           onStart={handleStart} 
           onStartTimer={handleStartTimer} 
           onStartDifficult={() => startDifficultMutation.mutate()}
-          onStartWangsohee={() => startWangsoheeMutation.mutate()}
+          onStartWangsohee={handleStartWangsohee}
           onStartWangsoheeTimer={handleStartWangsoheeTimer}
         />
       )}
@@ -487,6 +496,13 @@ function AppContent() {
       {appState === "wangsohee-timer-setup" && (
         <WangsoheeTimerSetup
           onStart={handleStartWangsoheeTimerWithCount}
+          onBack={handleHome}
+        />
+      )}
+
+      {appState === "wangsohee-setup" && (
+        <WangsoheeSetup
+          onStart={handleStartWangsoheeWithCount}
           onBack={handleHome}
         />
       )}

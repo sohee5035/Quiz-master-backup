@@ -94,7 +94,7 @@ export default function Home({ onStart, onStartTimer, onStartDifficult, onStartW
                   className="w-full bg-pink-600 hover:bg-pink-700 dark:bg-pink-800 dark:hover:bg-pink-900 text-white font-semibold py-3 sm:py-4 px-4 sm:px-6 rounded-xl transition-colors duration-200 shadow-sm text-sm sm:text-base"
                   data-testid="button-start-wangsohee-timer"
                 >
-                  ⚡👑 왕소희 문제 타이머 모드
+                  ⚡👑 왕소희 문제 타이머 모드 (30초)
                 </Button>
               </div>
             </div>

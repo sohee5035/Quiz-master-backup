@@ -13,11 +13,11 @@ interface TimerModeProps {
 }
 
 export default function TimerMode({ questionData, onAnswer, onNext, onSkip }: TimerModeProps) {
-  const [timeLeft, setTimeLeft] = useState(10);
+  const [timeLeft, setTimeLeft] = useState(30);
   const [showExplanation, setShowExplanation] = useState(false);
-  const [explanationTimeLeft, setExplanationTimeLeft] = useState(5);
+  const [explanationTimeLeft, setExplanationTimeLeft] = useState(15);
 
-  // Question timer (10 seconds)
+  // Question timer (30 seconds)
   useEffect(() => {
     if (questionData.isAnswered || showExplanation) return;
 
@@ -35,7 +35,7 @@ export default function TimerMode({ questionData, onAnswer, onNext, onSkip }: Ti
     return () => clearInterval(timer);
   }, [questionData.isAnswered, showExplanation, onSkip]);
 
-  // Explanation timer (5 seconds)
+  // Explanation timer (15 seconds)
   useEffect(() => {
     if (!showExplanation) return;
 
