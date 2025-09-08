@@ -18,7 +18,7 @@ export default function WangsoheeTimerSetup({ onStart, onBack }: WangsoheeTimerS
       <Card className="mt-8 shadow-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">👑⚡ 왕소희 타이머 모드 설정 ⚡👑</CardTitle>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">조금 어렵게 내봤습니다. 화이팅❤️‍🔥</p>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">본선 대비용 문제입니다! 조금 어렵게 내봤어요. 본선까지 화이팅🤩</p>
           <p className="text-sm text-gray-500 dark:text-gray-400">각 문제마다 30초의 제한 시간이 있습니다</p>
         </CardHeader>
         <CardContent className="p-8">
@@ -44,7 +44,7 @@ export default function WangsoheeTimerSetup({ onStart, onBack }: WangsoheeTimerS
           <div className="bg-pink-50 dark:bg-pink-900/30 rounded-lg border border-pink-200 dark:border-pink-800 p-4 mb-6">
             <h3 className="font-semibold text-pink-800 dark:text-pink-200 mb-2">👑 왕소희 타이머 모드 규칙</h3>
             <ul className="text-sm text-pink-700 dark:text-pink-200 space-y-1">
-              <li>• 왕소희님이 직접 만든 문제들만 출제</li>
+              <li>• 본선 대비용 문제들만 출제</li>
               <li>• 각 문제마다 30초의 제한 시간</li>
               <li>• 답을 선택하면 즉시 제출</li>
               <li>• 시간 초과 시 자동으로 다음 문제</li>

@@ -18,7 +18,7 @@ export default function WangsoheeSetup({ onStart, onBack }: WangsoheeSetupProps)
       <Card className="mt-4 sm:mt-8 shadow-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <CardHeader className="text-center p-4 sm:p-6">
           <CardTitle className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">👑 왕소희 제작 문제 👑</CardTitle>
-          <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm sm:text-base">조금 어렵게 내봤습니다. 화이팅❤️‍🔥</p>
+          <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm sm:text-base">본선 대비용 문제입니다! 조금 어렵게 내봤어요. 본선까지 화이팅🤩</p>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">문제 개수를 선택해서 연습하세요</p>
         </CardHeader>
         <CardContent className="p-4 sm:p-8">
@@ -59,7 +59,7 @@ export default function WangsoheeSetup({ onStart, onBack }: WangsoheeSetupProps)
           <div className="bg-pink-50 dark:bg-pink-900/30 rounded-lg border border-pink-200 dark:border-pink-800 p-3 sm:p-4 mb-4 sm:mb-6">
             <h3 className="font-semibold text-pink-800 dark:text-pink-200 mb-2 text-sm sm:text-base">👑 왕소희 제작 문제 특징</h3>
             <ul className="text-xs sm:text-sm text-pink-700 dark:text-pink-200 space-y-1">
-              <li>• 왕소희님이 직접 만든 문제들만 출제</li>
+              <li>• 본선 대비용 문제들만 출제</li>
               <li>• 기본 문제보다 조금 더 어려운 난이도</li>
               <li>• 실제 시험에서 나올 수 있는 응용 문제</li>
               <li>• 해설을 충분히 읽고 이해하며 학습</li>

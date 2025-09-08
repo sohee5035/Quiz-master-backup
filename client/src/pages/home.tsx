@@ -79,7 +79,7 @@ export default function Home({ onStart, onStartTimer, onStartDifficult, onStartW
             <div className="bg-pink-50 dark:bg-pink-900/30 rounded-xl border border-pink-200 dark:border-pink-800 p-4 sm:p-5">
               <div className="text-center mb-3 sm:mb-4">
                 <h3 className="text-base sm:text-lg font-semibold text-pink-800 dark:text-pink-200 mb-2">👑 왕소희 제작 문제</h3>
-                <p className="text-xs sm:text-sm text-pink-600 dark:text-pink-300">조금 어렵게 내봤습니다. 화이팅❤️‍🔥</p>
+                <p className="text-xs sm:text-sm text-pink-600 dark:text-pink-300">본선 대비용 문제입니다! 조금 어렵게 내봤어요. 본선까지 화이팅🤩</p>
               </div>
               <div className="space-y-2 sm:space-y-3">
                 <Button
