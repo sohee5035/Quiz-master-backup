@@ -13,6 +13,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { Eye, Calendar, BarChart3, Trash2, Globe, MessageSquare, Edit } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { Badge } from "@/components/ui/badge";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 // 조회수 통계 컴포넌트
 function StatsCard() {
@@ -88,6 +89,127 @@ function StatsCard() {
         
         <div className="text-xs text-gray-500 text-center">
           * 30초마다 자동 업데이트됩니다
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// 일별 방문 통계 차트 컴포넌트
+function DailyVisitChart() {
+  const { data: dailyStats, isLoading } = useQuery<{
+    date: string;
+    visitors: number;
+    pageViews: number;
+  }[]>({
+    queryKey: ['/api/admin/daily-stats'],
+    queryFn: async () => {
+      const response = await fetch('/api/admin/daily-stats?days=5');
+      const result = await response.json();
+      return result.data;
+    },
+    refetchInterval: 60000, // 1분마다 자동 새로고침
+  });
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5" />
+            일별 방문 통계 (최근 5일)
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8 text-gray-500 flex flex-col items-center gap-3">
+            <Spinner size="md" className="text-purple-500" />
+            통계 로딩 중...
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!dailyStats || dailyStats.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5" />
+            일별 방문 통계 (최근 5일)
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8 text-gray-500">
+            아직 방문 데이터가 없습니다.
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // 데이터를 날짜 포맷팅
+  const chartData = dailyStats.map(stat => ({
+    ...stat,
+    date: new Date(stat.date).toLocaleDateString('ko-KR', { 
+      month: 'short', 
+      day: 'numeric' 
+    })
+  }));
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <BarChart3 className="h-5 w-5" />
+          일별 방문 통계 (최근 5일)
+        </CardTitle>
+        <CardDescription>일별 방문자 수와 페이지뷰 추이</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="h-80 w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+              <XAxis 
+                dataKey="date" 
+                tick={{ fontSize: 12 }}
+                tickLine={false}
+              />
+              <YAxis 
+                tick={{ fontSize: 12 }}
+                tickLine={false}
+              />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--background))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '6px',
+                  fontSize: '12px'
+                }}
+                labelStyle={{ fontWeight: 'bold' }}
+              />
+              <Legend />
+              <Line 
+                type="monotone" 
+                dataKey="visitors" 
+                name="방문자 수"
+                stroke="#8b5cf6" 
+                strokeWidth={2}
+                dot={{ fill: '#8b5cf6', strokeWidth: 2, r: 4 }}
+                activeDot={{ r: 6 }}
+              />
+              <Line 
+                type="monotone" 
+                dataKey="pageViews" 
+                name="페이지뷰"
+                stroke="#06b6d4" 
+                strokeWidth={2}
+                dot={{ fill: '#06b6d4', strokeWidth: 2, r: 4 }}
+                activeDot={{ r: 6 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       </CardContent>
     </Card>
@@ -1386,6 +1508,7 @@ export default function Admin() {
 
               <TabsContent value="stats" className="space-y-4">
                 <StatsCard />
+                <DailyVisitChart />
                 <VisitorStatsCard />
                 <ModeStatsCard />
                 <QuestionStatsCard />
