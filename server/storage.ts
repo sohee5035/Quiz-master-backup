@@ -350,6 +350,60 @@ export class DatabaseStorage implements IStorage {
 
     await db.delete(comments).where(eq(comments.id, commentId));
   }
+
+  async getDailyVisitStats(days: number): Promise<{date: string; visitors: number; pageViews: number}[]> {
+    if (!isDbConnected) {
+      throw new Error("Database not connected");
+    }
+
+    // 최근 N일간의 날짜 범위 계산
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(endDate.getDate() - days + 1);
+    startDate.setHours(0, 0, 0, 0);
+
+    try {
+      const result = await db
+        .select({
+          date: sql<string>`DATE(visited_at) as date`,
+          visitors: sql<number>`COUNT(DISTINCT ip_address) as visitors`,
+          pageViews: sql<number>`COUNT(*) as page_views`
+        })
+        .from(pageViews)
+        .where(gte(pageViews.visitedAt, startDate))
+        .groupBy(sql`DATE(visited_at)`)
+        .orderBy(sql`DATE(visited_at)`);
+
+      // 결과를 날짜별로 매핑
+      const statsMap = new Map<string, {visitors: number; pageViews: number}>();
+      result.forEach(row => {
+        statsMap.set(row.date, {
+          visitors: row.visitors,
+          pageViews: row.pageViews
+        });
+      });
+
+      // 최근 N일간의 모든 날짜에 대해 데이터 생성 (없는 날은 0으로)
+      const stats: {date: string; visitors: number; pageViews: number}[] = [];
+      for (let i = 0; i < days; i++) {
+        const currentDate = new Date(startDate);
+        currentDate.setDate(startDate.getDate() + i);
+        const dateStr = currentDate.toISOString().split('T')[0];
+        
+        const dayStats = statsMap.get(dateStr) || {visitors: 0, pageViews: 0};
+        stats.push({
+          date: dateStr,
+          visitors: dayStats.visitors,
+          pageViews: dayStats.pageViews
+        });
+      }
+
+      return stats;
+    } catch (error) {
+      console.error("Error fetching daily visit stats:", error);
+      return [];
+    }
+  }
 }
 
 export class MemStorage implements IStorage {
