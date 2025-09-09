@@ -149,6 +149,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Question detail statistics endpoint - 문제 상세 분석
+  app.get("/api/admin/question-details/:questionId", async (req, res) => {
+    try {
+      const { questionId } = req.params;
+      const detailStats = await storage.getQuestionDetailStats(questionId);
+      
+      if (!detailStats) {
+        return res.status(404).json({ message: "문제를 찾을 수 없습니다." });
+      }
+
+      res.json({
+        success: true,
+        data: detailStats
+      });
+    } catch (error) {
+      console.error('Question detail stats error:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: "문제 상세 분석 중 오류가 발생했습니다." 
+      });
+    }
+  });
+
   // 어려운 문제 TOP 20 가져오기
   app.get("/api/questions/difficult-top20", async (req, res) => {
     try {

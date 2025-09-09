@@ -495,7 +495,7 @@ export class DatabaseStorage implements IStorage {
 
       // 결과를 날짜별로 매핑
       const statsMap = new Map<string, {visitors: number; pageViews: number}>();
-      result.forEach(row => {
+      result.forEach((row: any) => {
         statsMap.set(row.date, {
           visitors: row.visitors,
           pageViews: row.pageViews
