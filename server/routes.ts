@@ -1040,6 +1040,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // 관리자 페이지뷰 통계 API
+  app.get("/api/admin/page-views", async (req, res) => {
+    try {
+      const totalPageViews = await storage.getTotalPageViews();
+      const todayPageViews = await storage.getTodayPageViews();
+      const totalUniqueVisitors = await storage.getTotalUniqueVisitors();
+      const todayUniqueVisitors = await storage.getTodayUniqueVisitors();
+      const visitorStats = await storage.getVisitorStatsByIP();
+
+      res.status(200).json({
+        success: true,
+        data: {
+          totalPageViews,
+          todayPageViews,
+          totalUniqueVisitors,
+          todayUniqueVisitors,
+          visitorStats
+        }
+      });
+    } catch (error) {
+      console.error("페이지뷰 통계 조회 에러:", error);
+      res.status(500).json({ message: "페이지뷰 통계 조회에 실패했습니다." });
+    }
+  });
+
+  // 관리자 일별 방문 통계 API
+  app.get("/api/admin/daily-stats", async (req, res) => {
+    try {
+      const days = parseInt(req.query.days as string) || 5;
+      const dailyStats = await storage.getDailyVisitStats(days);
+
+      res.status(200).json({
+        success: true,
+        data: dailyStats
+      });
+    } catch (error) {
+      console.error("일별 통계 조회 에러:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "일별 통계 조회에 실패했습니다.",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
   // Page view tracking middleware (after all API routes)
   app.use(async (req, res, next) => {
     // 정적 파일과 API 경로는 제외
