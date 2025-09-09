@@ -308,14 +308,14 @@ function ModeStatsCard() {
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getModeColor(stat.mode)}`}>
                     {index + 1}위
                   </span>
-                  <span className="font-medium text-gray-900">{getModeDisplayName(stat.mode)}</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{getModeDisplayName(stat.mode)}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-gray-900">{stat.count}회</span>
-                  <span className="text-xs text-gray-500">({percentage}%)</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">{stat.count}회</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">({percentage}%)</span>
                 </div>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                 <div 
                   className="bg-gradient-to-r from-blue-400 to-purple-500 h-2 rounded-full transition-all duration-300"
                   style={{ width: `${percentage}%` }}
@@ -324,7 +324,7 @@ function ModeStatsCard() {
             </div>
           );
         })}
-        <div className="text-xs text-gray-500 text-center pt-4 border-t">
+        <div className="text-xs text-gray-500 dark:text-gray-400 text-center pt-4 border-t dark:border-gray-700">
           * 1분마다 자동 업데이트됩니다 | 총 세션 수: {totalSessions}개
         </div>
       </CardContent>
