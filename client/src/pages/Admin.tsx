@@ -141,20 +141,22 @@ function DailyVisitChart() {
         </CardHeader>
         <CardContent>
           <div className="text-center py-8 text-gray-500">
-            아직 방문 데이터가 없습니다.
+            <p>아직 방문 데이터가 없습니다.</p>
           </div>
         </CardContent>
       </Card>
     );
   }
 
-  // 데이터를 날짜 포맷팅
+  // 데이터를 날짜 포맷팅 및 숫자 변환
   const chartData = dailyStats.map(stat => ({
     ...stat,
     date: new Date(stat.date).toLocaleDateString('ko-KR', { 
       month: 'short', 
       day: 'numeric' 
-    })
+    }),
+    visitors: Number(stat.visitors),
+    pageViews: Number(stat.pageViews)
   }));
 
   return (
