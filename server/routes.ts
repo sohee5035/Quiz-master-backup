@@ -263,11 +263,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // IP별 방문자 통계 조회 API
   app.get("/api/admin/visitor-stats", async (req, res) => {
     try {
-      const visitorStats = await storage.getVisitorStatsByIP();
+      const { sortBy } = req.query;
+      const sortOption = sortBy === 'lastVisit' ? 'lastVisit' : 'visitCount';
+      
+      const visitorStats = await storage.getVisitorStatsByIP(sortOption);
       
       res.json({
         visitors: visitorStats,
         totalIPs: visitorStats.length,
+        sortBy: sortOption,
         message: "IP별 방문자 통계를 성공적으로 조회했습니다."
       });
     } catch (error) {

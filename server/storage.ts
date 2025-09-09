@@ -396,7 +396,11 @@ export class DatabaseStorage implements IStorage {
     return Number(result[0]?.count || 0);
   }
 
-  async getVisitorStatsByIP(): Promise<{ipAddress: string; visitCount: number; lastVisitAt: Date}[]> {
+  async getVisitorStatsByIP(sortBy: 'visitCount' | 'lastVisit' = 'visitCount'): Promise<{ipAddress: string; visitCount: number; lastVisitAt: Date}[]> {
+    const orderByClause = sortBy === 'lastVisit' 
+      ? sql`max(visited_at) desc` 
+      : sql`count(*) desc`;
+
     const result = await db
       .select({
         ipAddress: pageViews.ipAddress,
@@ -405,7 +409,7 @@ export class DatabaseStorage implements IStorage {
       })
       .from(pageViews)
       .groupBy(pageViews.ipAddress)
-      .orderBy(sql`count(*) desc`);
+      .orderBy(orderByClause);
     
     return result.map((row: any) => ({
       ipAddress: row.ipAddress,
