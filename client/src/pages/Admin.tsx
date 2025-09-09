@@ -614,46 +614,31 @@ function VisitorStatsCard() {
       <CardContent>
         <div className="space-y-3 max-h-80 overflow-y-auto">
           {visitors.length > 0 ? (
-            visitors.map((visitor, index) => {
-              const isFrequentVisitor = visitor.visitCount >= 10;
-              const isNewVisitor = visitor.visitCount === 1;
-              
-              return (
-                <div 
-                  key={visitor.ipAddress} 
-                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800"
-                >
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3">
-                      <span className="font-mono text-sm bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                        {visitor.ipAddress}
-                      </span>
-                      {isFrequentVisitor && (
-                        <Badge variant="secondary" className="bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300">
-                          단골방문자
-                        </Badge>
-                      )}
-                      {isNewVisitor && (
-                        <Badge variant="outline" className="text-green-700 border-green-300">
-                          신규방문자
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">
-                      마지막 방문: {new Date(visitor.lastVisitAt).toLocaleString('ko-KR')}
-                    </div>
+            visitors.map((visitor, index) => (
+              <div 
+                key={visitor.ipAddress} 
+                className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
+                <div className="flex-1">
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-sm bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+                      {visitor.ipAddress}
+                    </span>
                   </div>
-                  <div className="text-right">
-                    <div className="text-lg font-bold text-blue-600">
-                      {visitor.visitCount.toLocaleString()}회
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      #{index + 1}위 {sortBy === 'visitCount' ? '(방문횟수)' : '(최근방문)'}
-                    </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    마지막 방문: {new Date(visitor.lastVisitAt).toLocaleString('ko-KR')}
                   </div>
                 </div>
-              );
-            })
+                <div className="text-right">
+                  <div className="text-lg font-bold text-blue-600">
+                    {visitor.visitCount.toLocaleString()}회
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    #{index + 1}위 {sortBy === 'visitCount' ? '(방문횟수)' : '(최근방문)'}
+                  </div>
+                </div>
+              </div>
+            ))
           ) : (
             <div className="text-center py-8 text-gray-500">
               아직 방문자 데이터가 없습니다.
