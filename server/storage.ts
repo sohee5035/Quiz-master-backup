@@ -25,6 +25,26 @@ export interface IStorage {
   createResponse(response: InsertResponse): Promise<Response>;
   getResponsesForSession(sessionId: string): Promise<Response[]>;
   getResponsesForQuestion(questionId: string): Promise<Response[]>;
+  getQuestionDetailStats(questionId: string): Promise<{
+    question: Question;
+    choices: Choice[];
+    choiceStats: Array<{
+      choiceId: string | null;
+      content: string;
+      isCorrect: boolean;
+      count: number;
+      percentage: number;
+    }>;
+    booleanStats?: Array<{
+      value: boolean;
+      count: number;
+      percentage: number;
+      isCorrect: boolean;
+    }>;
+    totalResponses: number;
+    correctResponses: number;
+    accuracy: number;
+  } | null>;
   
   // Page Views
   recordPageView(pageView: InsertPageView): Promise<PageView>;
@@ -226,6 +246,105 @@ export class DatabaseStorage implements IStorage {
 
   async getResponsesForQuestion(questionId: string): Promise<Response[]> {
     return await db.select().from(responses).where(eq(responses.questionId, questionId));
+  }
+
+  async getQuestionDetailStats(questionId: string): Promise<{
+    question: Question;
+    choices: Choice[];
+    choiceStats: Array<{
+      choiceId: string | null;
+      content: string;
+      isCorrect: boolean;
+      count: number;
+      percentage: number;
+    }>;
+    booleanStats?: Array<{
+      value: boolean;
+      count: number;
+      percentage: number;
+      isCorrect: boolean;
+    }>;
+    totalResponses: number;
+    correctResponses: number;
+    accuracy: number;
+  } | null> {
+    // Get question
+    const [question] = await db.select().from(questions).where(eq(questions.id, questionId));
+    if (!question) return null;
+
+    // Get choices for the question
+    const questionChoices = await db.select().from(choices).where(eq(choices.questionId, questionId));
+    
+    // Get all responses for the question
+    const questionResponses = await db.select().from(responses).where(eq(responses.questionId, questionId));
+
+    const totalResponses = questionResponses.length;
+    const correctResponses = questionResponses.filter((r: Response) => r.isCorrect).length;
+    const accuracy = totalResponses > 0 ? (correctResponses / totalResponses) * 100 : 0;
+
+    if (question.type === 'MCQ') {
+      // For multiple choice questions, analyze by choice
+      const choiceStats = questionChoices.map((choice: Choice) => {
+        const choiceResponses = questionResponses.filter((r: Response) => r.choiceId === choice.id);
+        const count = choiceResponses.length;
+        const percentage = totalResponses > 0 ? (count / totalResponses) * 100 : 0;
+        
+        return {
+          choiceId: choice.id,
+          content: choice.content,
+          isCorrect: choice.isCorrect,
+          count,
+          percentage
+        };
+      });
+
+      // Sort by count (most selected first)
+      choiceStats.sort((a: any, b: any) => b.count - a.count);
+
+      return {
+        question,
+        choices: questionChoices,
+        choiceStats,
+        totalResponses,
+        correctResponses,
+        accuracy
+      };
+    } else {
+      // For OX questions, analyze by boolean value
+      const trueResponses = questionResponses.filter((r: Response) => r.selectedBoolean === true);
+      const falseResponses = questionResponses.filter((r: Response) => r.selectedBoolean === false);
+      
+      const trueCount = trueResponses.length;
+      const falseCount = falseResponses.length;
+      
+      const booleanStats = [
+        {
+          value: true,
+          count: trueCount,
+          percentage: totalResponses > 0 ? (trueCount / totalResponses) * 100 : 0,
+          isCorrect: question.answer === true
+        },
+        {
+          value: false,
+          count: falseCount,
+          percentage: totalResponses > 0 ? (falseCount / totalResponses) * 100 : 0,
+          isCorrect: question.answer === false
+        }
+      ];
+
+      // Sort by count (most selected first)
+      booleanStats.sort((a, b) => b.count - a.count);
+
+      return {
+        question,
+        choices: questionChoices,
+        choiceStats: [], // Empty for OX questions
+        booleanStats,
+        totalResponses,
+        correctResponses,
+        accuracy
+      };
+    }
   }
 
   async recordPageView(insertPageView: InsertPageView): Promise<PageView> {
@@ -765,6 +884,107 @@ export class MemStorage implements IStorage {
     }
 
     return stats;
+  }
+
+  async getQuestionDetailStats(questionId: string): Promise<{
+    question: Question;
+    choices: Choice[];
+    choiceStats: Array<{
+      choiceId: string | null;
+      content: string;
+      isCorrect: boolean;
+      count: number;
+      percentage: number;
+    }>;
+    booleanStats?: Array<{
+      value: boolean;
+      count: number;
+      percentage: number;
+      isCorrect: boolean;
+    }>;
+    totalResponses: number;
+    correctResponses: number;
+    accuracy: number;
+  } | null> {
+    // Get question
+    const question = this.questions.get(questionId);
+    if (!question) return null;
+
+    // Get choices for the question
+    const questionChoices = Array.from(this.choices.values())
+      .filter(choice => choice.questionId === questionId);
+    
+    // Get all responses for the question
+    const questionResponses = Array.from(this.responses.values())
+      .filter(response => response.questionId === questionId);
+
+    const totalResponses = questionResponses.length;
+    const correctResponses = questionResponses.filter((r: Response) => r.isCorrect).length;
+    const accuracy = totalResponses > 0 ? (correctResponses / totalResponses) * 100 : 0;
+
+    if (question.type === 'MCQ') {
+      // For multiple choice questions, analyze by choice
+      const choiceStats = questionChoices.map((choice: Choice) => {
+        const choiceResponses = questionResponses.filter((r: Response) => r.choiceId === choice.id);
+        const count = choiceResponses.length;
+        const percentage = totalResponses > 0 ? (count / totalResponses) * 100 : 0;
+        
+        return {
+          choiceId: choice.id,
+          content: choice.content,
+          isCorrect: choice.isCorrect,
+          count,
+          percentage
+        };
+      });
+
+      // Sort by count (most selected first)
+      choiceStats.sort((a: any, b: any) => b.count - a.count);
+
+      return {
+        question,
+        choices: questionChoices,
+        choiceStats,
+        totalResponses,
+        correctResponses,
+        accuracy
+      };
+    } else {
+      // For OX questions, analyze by boolean value
+      const trueResponses = questionResponses.filter((r: Response) => r.selectedBoolean === true);
+      const falseResponses = questionResponses.filter((r: Response) => r.selectedBoolean === false);
+      
+      const trueCount = trueResponses.length;
+      const falseCount = falseResponses.length;
+      
+      const booleanStats = [
+        {
+          value: true,
+          count: trueCount,
+          percentage: totalResponses > 0 ? (trueCount / totalResponses) * 100 : 0,
+          isCorrect: question.answer === true
+        },
+        {
+          value: false,
+          count: falseCount,
+          percentage: totalResponses > 0 ? (falseCount / totalResponses) * 100 : 0,
+          isCorrect: question.answer === false
+        }
+      ];
+
+      // Sort by count (most selected first)
+      booleanStats.sort((a: any, b: any) => b.count - a.count);
+
+      return {
+        question,
+        choices: questionChoices,
+        choiceStats: [], // Empty for OX questions
+        booleanStats,
+        totalResponses,
+        correctResponses,
+        accuracy
+      };
+    }
   }
 }
 
