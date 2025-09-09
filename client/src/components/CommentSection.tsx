@@ -67,7 +67,7 @@ export default function CommentSection() {
     <Card className="mt-8 shadow-sm">
       <CardHeader>
         <CardTitle className="text-xl font-bold text-center">💬 문제점이나 의견 남겨주세요!</CardTitle>
-        <p className="text-sm text-gray-600 text-center">
+        <p className="text-sm text-gray-600 dark:text-gray-300 text-center">
           앱 개선을 위한 소중한 의견을 기다립니다. 익명으로 댓글을 남기실 수 있습니다.
         </p>
       </CardHeader>
@@ -84,7 +84,7 @@ export default function CommentSection() {
             data-testid="textarea-comment"
           />
           <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-gray-500 dark:text-gray-400">
               {comment.length}/500자
             </span>
             <Button
@@ -100,15 +100,15 @@ export default function CommentSection() {
 
         {/* 댓글 목록 */}
         <div className="space-y-4">
-          <div className="border-t pt-4">
-            <h3 className="font-semibold text-gray-900 mb-3">
+          <div className="border-t dark:border-gray-700 pt-4">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
               등록된 댓글 ({comments.length}개)
             </h3>
             
             {isLoading ? (
-              <div className="text-center py-4 text-gray-500">댓글을 불러오는 중...</div>
+              <div className="text-center py-4 text-gray-500 dark:text-gray-400">댓글을 불러오는 중...</div>
             ) : comments.length === 0 ? (
-              <div className="text-center py-4 text-gray-500">
+              <div className="text-center py-4 text-gray-500 dark:text-gray-400">
                 아직 등록된 댓글이 없습니다. 첫 번째 댓글을 남겨보세요!
               </div>
             ) : (
@@ -116,13 +116,13 @@ export default function CommentSection() {
                 {comments.map((comment: any) => (
                   <div
                     key={comment.id}
-                    className="bg-gray-50 rounded-lg p-3 border"
+                    className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 border dark:border-gray-700"
                     data-testid={`comment-${comment.id}`}
                   >
-                    <div className="text-sm text-gray-900 whitespace-pre-wrap mb-2">
+                    <div className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap mb-2">
                       {comment.content}
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
                       {comment.createdAt 
                         ? format(new Date(comment.createdAt), "yyyy년 MM월 dd일 HH:mm", { locale: ko })
                         : "방금 전"
