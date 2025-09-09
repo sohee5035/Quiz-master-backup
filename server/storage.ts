@@ -52,7 +52,7 @@ export interface IStorage {
   getTotalPageViews(): Promise<number>;
   getTodayUniqueVisitors(): Promise<number>;
   getTotalUniqueVisitors(): Promise<number>;
-  getVisitorStatsByIP(): Promise<{ipAddress: string; visitCount: number; lastVisitAt: Date}[]>;
+  getVisitorStatsByIP(sortBy?: 'visitCount' | 'lastVisit'): Promise<{ipAddress: string; visitCount: number; lastVisitAt: Date}[]>;
   getDailyVisitStats(days: number): Promise<{date: string; visitors: number; pageViews: number}[]>;
   
   // Comments
@@ -762,7 +762,7 @@ export class MemStorage implements IStorage {
     return uniqueIPs.size;
   }
 
-  async getVisitorStatsByIP(): Promise<{ipAddress: string; visitCount: number; lastVisitAt: Date}[]> {
+  async getVisitorStatsByIP(sortBy: 'visitCount' | 'lastVisit' = 'visitCount'): Promise<{ipAddress: string; visitCount: number; lastVisitAt: Date}[]> {
     const ipStats = new Map<string, {visitCount: number; lastVisitAt: Date}>();
     
     // Process all page views
@@ -783,14 +783,20 @@ export class MemStorage implements IStorage {
       }
     });
     
-    // Convert to array and sort by visit count (descending)
-    return Array.from(ipStats.entries())
-      .map(([ipAddress, stats]) => ({
-        ipAddress,
-        visitCount: stats.visitCount,
-        lastVisitAt: stats.lastVisitAt
-      }))
-      .sort((a, b) => b.visitCount - a.visitCount);
+    // Convert to array and sort based on the sortBy parameter
+    const results = Array.from(ipStats.entries()).map(([ipAddress, stats]) => ({
+      ipAddress,
+      visitCount: stats.visitCount,
+      lastVisitAt: stats.lastVisitAt
+    }));
+    
+    return results.sort((a, b) => {
+      if (sortBy === 'lastVisit') {
+        return b.lastVisitAt.getTime() - a.lastVisitAt.getTime();
+      } else {
+        return b.visitCount - a.visitCount;
+      }
+    });
   }
 
   async deleteQuestion(questionId: string): Promise<void> {
