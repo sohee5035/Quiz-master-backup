@@ -33,6 +33,7 @@ export interface IStorage {
   getTodayUniqueVisitors(): Promise<number>;
   getTotalUniqueVisitors(): Promise<number>;
   getVisitorStatsByIP(): Promise<{ipAddress: string; visitCount: number; lastVisitAt: Date}[]>;
+  getDailyVisitStats(days: number): Promise<{date: string; visitors: number; pageViews: number}[]>;
   
   // Comments
   createComment(comment: InsertComment): Promise<Comment>;
