@@ -543,12 +543,19 @@ function AdminLogin({ onLogin }: { onLogin: () => void }) {
 
 // IP별 방문자 통계 컴포넌트
 function VisitorStatsCard() {
+  const [sortBy, setSortBy] = useState<'visitCount' | 'lastVisit'>('visitCount');
+
   const { data: visitorStats, isLoading } = useQuery<{
     visitors: {ipAddress: string; visitCount: number; lastVisitAt: string}[];
     totalIPs: number;
+    sortBy: string;
     message: string;
   }>({
-    queryKey: ['/api/admin/visitor-stats'],
+    queryKey: ['/api/admin/visitor-stats', sortBy],
+    queryFn: async () => {
+      const response = await fetch(`/api/admin/visitor-stats?sortBy=${sortBy}`);
+      return response.json();
+    },
     refetchInterval: 60000, // 1분마다 새로고침
   });
 
@@ -577,11 +584,33 @@ function VisitorStatsCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Globe className="h-5 w-5" />
-          IP별 방문자 통계
-        </CardTitle>
-        <CardDescription>각 IP 주소별 재방문 횟수 분석 (총 {totalIPs}개 IP)</CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Globe className="h-5 w-5" />
+              IP별 방문자 통계
+            </CardTitle>
+            <CardDescription>각 IP 주소별 재방문 횟수 분석 (총 {totalIPs}개 IP)</CardDescription>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant={sortBy === 'visitCount' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSortBy('visitCount')}
+              data-testid="button-sort-visit-count"
+            >
+              방문횟수순
+            </Button>
+            <Button
+              variant={sortBy === 'lastVisit' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSortBy('lastVisit')}
+              data-testid="button-sort-last-visit"
+            >
+              최근방문순
+            </Button>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-3 max-h-80 overflow-y-auto">
@@ -620,7 +649,7 @@ function VisitorStatsCard() {
                       {visitor.visitCount.toLocaleString()}회
                     </div>
                     <div className="text-xs text-gray-500">
-                      #{index + 1}위
+                      #{index + 1}위 {sortBy === 'visitCount' ? '(방문횟수)' : '(최근방문)'}
                     </div>
                   </div>
                 </div>
@@ -631,6 +660,10 @@ function VisitorStatsCard() {
               아직 방문자 데이터가 없습니다.
             </div>
           )}
+        </div>
+        
+        <div className="text-xs text-gray-500 dark:text-gray-400 text-center mt-4 pt-4 border-t dark:border-gray-700">
+          * 1분마다 자동 업데이트됩니다 | 현재 정렬: {sortBy === 'visitCount' ? '방문횟수순' : '최근방문순'}
         </div>
       </CardContent>
     </Card>
