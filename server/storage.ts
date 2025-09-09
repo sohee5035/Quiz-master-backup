@@ -720,6 +720,52 @@ export class MemStorage implements IStorage {
   async deleteComment(commentId: string): Promise<void> {
     this.comments.delete(commentId);
   }
+
+  async getDailyVisitStats(days: number): Promise<{date: string; visitors: number; pageViews: number}[]> {
+    // 최근 N일간의 날짜 범위 계산
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(endDate.getDate() - days + 1);
+    startDate.setHours(0, 0, 0, 0);
+
+    // 날짜별 통계 계산
+    const dailyStats = new Map<string, {ipSet: Set<string>; pageViewCount: number}>();
+
+    // 모든 페이지뷰를 순회하면서 날짜별로 그룹핑
+    Array.from(this.pageViews.values()).forEach(pageView => {
+      if (pageView.visitedAt && pageView.visitedAt >= startDate) {
+        const dateStr = pageView.visitedAt.toISOString().split('T')[0];
+        
+        if (!dailyStats.has(dateStr)) {
+          dailyStats.set(dateStr, {
+            ipSet: new Set<string>(),
+            pageViewCount: 0
+          });
+        }
+        
+        const dayStats = dailyStats.get(dateStr)!;
+        dayStats.ipSet.add(pageView.ipAddress);
+        dayStats.pageViewCount += 1;
+      }
+    });
+
+    // 최근 N일간의 모든 날짜에 대해 데이터 생성 (없는 날은 0으로)
+    const stats: {date: string; visitors: number; pageViews: number}[] = [];
+    for (let i = 0; i < days; i++) {
+      const currentDate = new Date(startDate);
+      currentDate.setDate(startDate.getDate() + i);
+      const dateStr = currentDate.toISOString().split('T')[0];
+      
+      const dayStats = dailyStats.get(dateStr);
+      stats.push({
+        date: dateStr,
+        visitors: dayStats ? dayStats.ipSet.size : 0,
+        pageViews: dayStats ? dayStats.pageViewCount : 0
+      });
+    }
+
+    return stats;
+  }
 }
 
 // Initialize storage based on database availability
