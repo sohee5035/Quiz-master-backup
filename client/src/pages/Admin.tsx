@@ -584,32 +584,31 @@ function VisitorStatsCard() {
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="flex items-center gap-2">
-              <Globe className="h-5 w-5" />
-              IP별 방문자 통계
-            </CardTitle>
-            <CardDescription>각 IP 주소별 재방문 횟수 분석 (총 {totalIPs}개 IP)</CardDescription>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              variant={sortBy === 'visitCount' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setSortBy('visitCount')}
-              data-testid="button-sort-visit-count"
-            >
-              방문횟수순
-            </Button>
-            <Button
-              variant={sortBy === 'lastVisit' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setSortBy('lastVisit')}
-              data-testid="button-sort-last-visit"
-            >
-              최근방문순
-            </Button>
-          </div>
+        <CardTitle className="flex items-center gap-2">
+          <Globe className="h-5 w-5" />
+          IP별 방문자 통계
+        </CardTitle>
+        <CardDescription>각 IP 주소별 재방문 횟수 분석 (총 {totalIPs}개 IP)</CardDescription>
+        
+        <div className="flex gap-2 mt-4">
+          <Button
+            variant={sortBy === 'visitCount' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setSortBy('visitCount')}
+            data-testid="button-sort-visit-count"
+            className="flex-1 sm:flex-none"
+          >
+            방문횟수순
+          </Button>
+          <Button
+            variant={sortBy === 'lastVisit' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setSortBy('lastVisit')}
+            data-testid="button-sort-last-visit"
+            className="flex-1 sm:flex-none"
+          >
+            최근방문순
+          </Button>
         </div>
       </CardHeader>
       <CardContent>
