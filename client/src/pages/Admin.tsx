@@ -14,6 +14,7 @@ import { Eye, Calendar, BarChart3, Trash2, Globe, MessageSquare, Edit } from "lu
 import { Spinner } from "@/components/ui/spinner";
 import { Badge } from "@/components/ui/badge";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import QuestionDetailModal from "@/components/QuestionDetailModal";
 
 // 조회수 통계 컴포넌트
 function StatsCard() {
@@ -336,6 +337,9 @@ function ModeStatsCard() {
 
 // 문제별 정답률 통계 컴포넌트
 function QuestionStatsCard() {
+  const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const { data: questionStats, isLoading: isQuestionStatsLoading } = useQuery<{
     questionId: string;
     questionStem: string;
@@ -399,6 +403,16 @@ function QuestionStatsCard() {
     return "미설정";
   };
 
+  const handleQuestionClick = (questionId: string) => {
+    setSelectedQuestionId(questionId);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedQuestionId(null);
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -413,7 +427,11 @@ function QuestionStatsCard() {
       <CardContent>
         <div className="space-y-3 max-h-96 overflow-y-auto">
           {questionStats.map((stat) => (
-            <div key={stat.questionId} className="border rounded-lg p-4 hover:bg-gray-50">
+            <div 
+              key={stat.questionId} 
+              className="border rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
+              onClick={() => handleQuestionClick(stat.questionId)}
+            >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <span className="font-mono text-sm text-gray-500">{stat.questionId}</span>
@@ -441,9 +459,18 @@ function QuestionStatsCard() {
         </div>
         
         <div className="text-xs text-gray-500 text-center mt-4">
-          * 1분마다 자동 업데이트됩니다
+          * 1분마다 자동 업데이트됩니다 | 문제를 클릭하면 상세 분석을 볼 수 있습니다
         </div>
       </CardContent>
+
+      {/* Question Detail Modal */}
+      {selectedQuestionId && (
+        <QuestionDetailModal
+          questionId={selectedQuestionId}
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+        />
+      )}
     </Card>
   );
 }
