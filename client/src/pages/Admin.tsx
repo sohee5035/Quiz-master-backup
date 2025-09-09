@@ -179,6 +179,8 @@ function DailyVisitChart() {
                 tickLine={false}
               />
               <YAxis 
+                domain={[0, 150]}
+                ticks={[0, 30, 60, 90, 120, 150]}
                 tick={{ fontSize: 12 }}
                 tickLine={false}
               />
