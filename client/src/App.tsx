@@ -410,7 +410,7 @@ function AppContent() {
       <nav className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-4xl mx-auto px-4 py-3">
           <div className="flex justify-between items-center">
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">🏆 KB 외환 마스터 👑</h1>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">🏆 은행실무종합과정 문제풀이 👑</h1>
             <div className="flex items-center space-x-4">
               <button
                 onClick={handleHome}

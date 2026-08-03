@@ -25,6 +25,7 @@ export const choices = pgTable("choices", {
 export const sessions = pgTable("sessions", {
   id: text("id").primaryKey(),
   mode: text("mode").notNull(), // 'study', 'mock', 'review', 'wangsohee'
+  ipAddress: text("ip_address"),
   startedAt: timestamp("started_at").defaultNow(),
   endedAt: timestamp("ended_at"),
 });

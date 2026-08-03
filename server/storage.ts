@@ -85,27 +85,27 @@ export class DatabaseStorage implements IStorage {
         return; // Data already exists
       }
 
-      // Seed the test questions exactly as specified
+      // Seed placeholder questions for 은행실무종합과정
       const q1 = {
         id: "q1",
         type: "MCQ",
-        stem: "다음 중 외국통화매매 거래시 영업점장 전결 최대 환율 우대율이 80%가 아닌 통화는?",
-        explanation: "CNY통화는 영업점장 전결로 최대 50%까지 환율우대율이 적용됩니다.",
-        tags: "환율우대",
-        difficulty: 2,
-        source: "외환 규정집",
+        stem: "다음 중 수신업무에서 요구불예금에 해당하지 않는 것은?",
+        explanation: "정기예금은 만기가 정해진 저축성예금으로, 요구불예금이 아닙니다.",
+        tags: "수신업무",
+        difficulty: 1,
+        source: "은행실무종합과정",
         answer: null,
       };
 
       const q2 = {
         id: "q2",
         type: "OX",
-        stem: "외국통화 매입시 손상화폐의 경우 손상정도에 따라 일부 금액만 지불하고 매입이 가능하다.",
-        explanation: "손상화폐나 위변조통화는 매매가 불가능합니다. (외환 > 외환공통 > 제1장 > 제1절 > 제1관 외국통화매입신청서 접수",
-        tags: "외환공통",
+        stem: "금융실명거래 및 비밀보장에 관한 법률에 따라 금융거래 정보는 명의인의 서면 동의 없이 제3자에게 제공할 수 없다.",
+        explanation: "금융실명법에 따라 금융거래정보는 원칙적으로 명의인의 서면상 동의 없이 타인에게 제공하거나 누설할 수 없습니다.",
+        tags: "금융실명법",
         difficulty: 1,
-        source: "외환 규정집",
-        answer: false,
+        source: "은행실무종합과정",
+        answer: true,
       };
 
       // Insert questions
@@ -113,10 +113,10 @@ export class DatabaseStorage implements IStorage {
 
       // Q1 choices
       const choices1 = [
-        { id: "q1c1", questionId: "q1", content: "USD", isCorrect: false },
-        { id: "q1c2", questionId: "q1", content: "JPY", isCorrect: false },
-        { id: "q1c3", questionId: "q1", content: "CNY", isCorrect: true },
-        { id: "q1c4", questionId: "q1", content: "EUR", isCorrect: false },
+        { id: "q1c1", questionId: "q1", content: "보통예금", isCorrect: false },
+        { id: "q1c2", questionId: "q1", content: "당좌예금", isCorrect: false },
+        { id: "q1c3", questionId: "q1", content: "정기예금", isCorrect: true },
+        { id: "q1c4", questionId: "q1", content: "저축예금", isCorrect: false },
       ];
 
       await db.insert(choices).values(choices1);
@@ -549,15 +549,15 @@ export class MemStorage implements IStorage {
   }
 
   private seedData() {
-    // Seed the test questions exactly as specified
+    // Seed placeholder questions for 은행실무종합과정
     const q1: Question = {
       id: "q1",
       type: "MCQ",
-      stem: "다음 중 외국통화매매 거래시 영업점장 전결 최대 환율 우대율이 80%가 아닌 통화는?",
-      explanation: "CNY통화는 영업점장 전결로 최대 50%까지 환율우대율이 적용됩니다.",
-      tags: "환율우대",
-      difficulty: 2,
-      source: "외환 규정집",
+      stem: "다음 중 수신업무에서 요구불예금에 해당하지 않는 것은?",
+      explanation: "정기예금은 만기가 정해진 저축성예금으로, 요구불예금이 아닙니다.",
+      tags: "수신업무",
+      difficulty: 1,
+      source: "은행실무종합과정",
       answer: null,
       author: "default",
     };
@@ -565,12 +565,12 @@ export class MemStorage implements IStorage {
     const q2: Question = {
       id: "q2",
       type: "OX",
-      stem: "외국통화 매입시 손상화폐의 경우 손상정도에 따라 일부 금액만 지불하고 매입이 가능하다.",
-      explanation: "손상화폐나 위변조통화는 매매가 불가능합니다. (외환 > 외환공통 > 제1장 > 제1절 > 제1관 외국통화매입신청서 접수",
-      tags: "외환공통",
+      stem: "금융실명거래 및 비밀보장에 관한 법률에 따라 금융거래 정보는 명의인의 서면 동의 없이 제3자에게 제공할 수 없다.",
+      explanation: "금융실명법에 따라 금융거래정보는 원칙적으로 명의인의 서면상 동의 없이 타인에게 제공하거나 누설할 수 없습니다.",
+      tags: "금융실명법",
       difficulty: 1,
-      source: "외환 규정집",
-      answer: false,
+      source: "은행실무종합과정",
+      answer: true,
       author: "default",
     };
 
@@ -579,10 +579,10 @@ export class MemStorage implements IStorage {
 
     // Q1 choices
     const choices1 = [
-      { id: "q1c1", questionId: "q1", content: "USD", isCorrect: false },
-      { id: "q1c2", questionId: "q1", content: "JPY", isCorrect: false },
-      { id: "q1c3", questionId: "q1", content: "CNY", isCorrect: true },
-      { id: "q1c4", questionId: "q1", content: "EUR", isCorrect: false },
+      { id: "q1c1", questionId: "q1", content: "보통예금", isCorrect: false },
+      { id: "q1c2", questionId: "q1", content: "당좌예금", isCorrect: false },
+      { id: "q1c3", questionId: "q1", content: "정기예금", isCorrect: true },
+      { id: "q1c4", questionId: "q1", content: "저축예금", isCorrect: false },
     ];
 
     choices1.forEach(choice => this.choices.set(choice.id, choice));

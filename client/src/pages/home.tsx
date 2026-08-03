@@ -22,7 +22,7 @@ export default function Home({ onStart, onStartTimer, onStartDifficult, onStartW
               <div className="mascot-container">
                 <img 
                   src={mascotImage} 
-                  alt="KB 외환 마스터 캐릭터" 
+                  alt="은행실무종합과정 마스코트" 
                   className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-orange-50 dark:bg-orange-900/30 p-1"
                 />
                 <span className="sparkle" style={{top: '-5px', left: '-5px'}}>✨</span>
@@ -31,18 +31,17 @@ export default function Home({ onStart, onStartTimer, onStartDifficult, onStartW
                 <span className="sparkle" style={{bottom: '-8px', right: '-5px'}}>✨</span>
                 <span className="sparkle" style={{top: '15px', left: '-12px'}}>🌟</span>
               </div>
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">🏆 KB 외환 마스터 👑</h1>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">🏆 은행실무종합과정 문제풀이 👑</h1>
             </div>
           </div>
 
           {/* 간소화된 안내 박스 */}
           <div className="bg-yellow-50 dark:bg-yellow-900/30 rounded-lg border border-yellow-200 dark:border-yellow-800 p-3 sm:p-4 mb-4 sm:mb-6">
             <div className="text-center space-y-2 sm:space-y-3">
-              <div className="text-sm sm:text-base font-semibold text-gray-900 dark:text-yellow-100 mb-2">외환 마스터가 되는 그 날까지✨</div>
-              <div className="text-xs sm:text-sm text-gray-700 dark:text-yellow-200 mb-1">📅 본선 25.09.12 (금) 16:00</div>
+              <div className="text-sm sm:text-base font-semibold text-gray-900 dark:text-yellow-100 mb-2">은행실무종합과정 완벽 마스터까지✨</div>
               <div className="text-xs sm:text-sm text-gray-800 dark:text-yellow-200 space-y-1">
-                <div>기본 문제는 외환사업부 410 연습문제가 나옵니다!</div>
-                <div>제작문제는 본선 범위에 맞는 문제로 구성했습니다.<br className="hidden sm:block"/><span className="sm:hidden"> </span>(업데이트 예정)</div>
+                <div>기본 문제와 왕소희 제작문제로 실력을 키워보세요!</div>
+                <div>제작문제는 과정 범위에 맞는 문제로 구성했습니다.<br className="hidden sm:block"/><span className="sm:hidden"> </span>(업데이트 예정)</div>
                 <div>🌙 맨 위 Dark 버튼을 눌러보세요</div>
                 <div className="text-xs sm:text-sm font-bold">문의사항이나 의견은 하단 댓글로 남겨주세요 😊</div>
               </div>
