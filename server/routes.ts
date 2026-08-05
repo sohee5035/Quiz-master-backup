@@ -1,8 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storage, getWrongQuestionIdsForEmployee } from "./storage";
 import { z } from "zod";
-import type { SessionResponse, AnswerResponse, ResultsResponse, QuestionWithChoices, Response } from "@shared/schema";
+import type { SessionResponse, AnswerResponse, ResultsResponse, QuestionWithChoices, Response, Question, SessionHistoryItem } from "@shared/schema";
 import multer from "multer";
 import csv from "csv-parser";
 import { Readable } from "stream";
@@ -67,6 +67,184 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Questions count error:', error);
       res.status(500).json({ message: "문제 수 조회 중 오류가 발생했습니다." });
+    }
+  });
+
+  // 과목 목록 조회 (문제에 등록된 과목들, 홈 화면 과목 선택용)
+  app.get("/api/subjects", async (req, res) => {
+    try {
+      const questions = await storage.getQuestions();
+      const subjects = Array.from(
+        new Set(questions.map(q => q.subject).filter((s): s is string => !!s))
+      ).sort();
+      res.json({ subjects });
+    } catch (error) {
+      console.error('Subjects error:', error);
+      res.status(500).json({ message: "과목 목록 조회 중 오류가 발생했습니다." });
+    }
+  });
+
+  // 직원번호로 로그인 (비밀번호 없음, 관리자가 등록한 명부와 대조)
+  app.post("/api/login", async (req, res) => {
+    try {
+      const { employeeId } = req.body;
+
+      if (!employeeId || typeof employeeId !== "string" || !employeeId.trim()) {
+        return res.status(400).json({ message: "직원번호를 입력해주세요." });
+      }
+
+      const employee = await storage.getEmployee(employeeId.trim());
+      if (!employee) {
+        return res.status(404).json({ message: "등록되지 않은 직원번호입니다. 관리자에게 등록을 요청해주세요." });
+      }
+
+      res.json({ employeeId: employee.id, name: employee.name });
+    } catch (error) {
+      console.error("Error logging in:", error);
+      res.status(500).json({ message: "로그인에 실패했습니다." });
+    }
+  });
+
+  // 관리자 API - 직원 명부 조회
+  app.get("/api/admin/employees", async (req, res) => {
+    try {
+      const employees = await storage.getAllEmployees();
+      res.json({ employees });
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+      res.status(500).json({ message: "직원 명부 조회에 실패했습니다." });
+    }
+  });
+
+  // 관리자 API - 직원 등록
+  app.post("/api/admin/employees", async (req, res) => {
+    try {
+      const { employeeId, name } = req.body;
+
+      if (!employeeId || typeof employeeId !== "string" || !employeeId.trim()) {
+        return res.status(400).json({ message: "직원번호를 입력해주세요." });
+      }
+      if (!name || typeof name !== "string" || !name.trim()) {
+        return res.status(400).json({ message: "이름을 입력해주세요." });
+      }
+
+      const existing = await storage.getEmployee(employeeId.trim());
+      if (existing) {
+        return res.status(409).json({ message: "이미 등록된 직원번호입니다." });
+      }
+
+      const employee = await storage.createEmployee({ id: employeeId.trim(), name: name.trim() });
+      res.json({ message: "직원이 등록되었습니다.", employee });
+    } catch (error) {
+      console.error("Error creating employee:", error);
+      res.status(500).json({ message: "직원 등록에 실패했습니다." });
+    }
+  });
+
+  // 관리자 API - 직원 이름 수정
+  app.put("/api/admin/employees/:id", async (req, res) => {
+    try {
+      const { name } = req.body;
+      if (!name || typeof name !== "string" || !name.trim()) {
+        return res.status(400).json({ message: "이름을 입력해주세요." });
+      }
+
+      const employee = await storage.updateEmployee(req.params.id, name.trim());
+      res.json({ message: "직원 정보가 수정되었습니다.", employee });
+    } catch (error) {
+      console.error("Error updating employee:", error);
+      res.status(500).json({ message: "직원 정보 수정에 실패했습니다." });
+    }
+  });
+
+  // 관리자 API - 직원 삭제
+  app.delete("/api/admin/employees/:id", async (req, res) => {
+    try {
+      await storage.deleteEmployee(req.params.id);
+      res.json({ message: "직원이 삭제되었습니다." });
+    } catch (error) {
+      console.error("Error deleting employee:", error);
+      res.status(500).json({ message: "직원 삭제에 실패했습니다." });
+    }
+  });
+
+  // 내 북마크 목록 조회
+  app.get("/api/employees/:employeeId/bookmarks", async (req, res) => {
+    try {
+      const bookmarks = await storage.getBookmarksForEmployee(req.params.employeeId);
+      const questionList = (
+        await Promise.all(bookmarks.map(b => storage.getQuestion(b.questionId)))
+      ).filter((q): q is Question => !!q);
+
+      res.json({ questions: questionList });
+    } catch (error) {
+      console.error("Error fetching bookmarks:", error);
+      res.status(500).json({ message: "북마크 조회에 실패했습니다." });
+    }
+  });
+
+  // 북마크 추가
+  app.post("/api/employees/:employeeId/bookmarks", async (req, res) => {
+    try {
+      const { questionId } = req.body;
+      if (!questionId) {
+        return res.status(400).json({ message: "문제 ID가 필요합니다." });
+      }
+
+      const bookmark = await storage.addBookmark(req.params.employeeId, questionId);
+      res.json({ message: "북마크에 추가되었습니다.", bookmark });
+    } catch (error) {
+      console.error("Error adding bookmark:", error);
+      res.status(500).json({ message: "북마크 추가에 실패했습니다." });
+    }
+  });
+
+  // 북마크 제거
+  app.delete("/api/employees/:employeeId/bookmarks/:questionId", async (req, res) => {
+    try {
+      await storage.removeBookmark(req.params.employeeId, req.params.questionId);
+      res.json({ message: "북마크가 제거되었습니다." });
+    } catch (error) {
+      console.error("Error removing bookmark:", error);
+      res.status(500).json({ message: "북마크 제거에 실패했습니다." });
+    }
+  });
+
+  // 틀린 문제 개수 (현재 기준으로 틀리고 있는 문제)
+  app.get("/api/employees/:employeeId/wrong-questions", async (req, res) => {
+    try {
+      const wrongIds = await getWrongQuestionIdsForEmployee(req.params.employeeId);
+      res.json({ count: wrongIds.length, questionIds: wrongIds });
+    } catch (error) {
+      console.error("Error fetching wrong questions:", error);
+      res.status(500).json({ message: "틀린 문제 조회에 실패했습니다." });
+    }
+  });
+
+  // 내 응시 이력 (마이페이지)
+  app.get("/api/employees/:employeeId/sessions", async (req, res) => {
+    try {
+      const employeeSessions = await storage.getSessionsForEmployee(req.params.employeeId);
+
+      const history: SessionHistoryItem[] = await Promise.all(
+        employeeSessions
+          .filter(session => session.endedAt) // 완료된 세션만
+          .map(async (session) => {
+            const sessionResponses = await storage.getResponsesForSession(session.id);
+            return {
+              sessionId: session.id,
+              mode: session.mode,
+              startedAt: session.startedAt ? session.startedAt.toISOString() : null,
+              totalQuestions: sessionResponses.length,
+              correctAnswers: sessionResponses.filter(r => r.isCorrect).length,
+            };
+          })
+      );
+
+      res.json({ sessions: history });
+    } catch (error) {
+      console.error("Error fetching employee sessions:", error);
+      res.status(500).json({ message: "응시 이력 조회에 실패했습니다." });
     }
   });
 
@@ -283,10 +461,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Start a new session and return first question
   app.post("/api/session/start", async (req, res) => {
     try {
-      const { mode = "study", questionCount, difficulty } = req.body;
-      
-      const session = await storage.createSession({ mode });
-      
+      const { mode = "study", questionCount, difficulty, subject, employeeId } = req.body;
+
+      const session = await storage.createSession({ mode, employeeId: employeeId || null });
+
       // Get questions based on mode
       let questions;
       if (mode === "wangsohee" || mode === "wangsohee-timer") {
@@ -294,16 +472,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else if (mode === "difficult") {
         // For difficult mode, get ALL questions (not just default)
         questions = await storage.getQuestions();
+      } else if (mode === "wrong") {
+        if (!employeeId) {
+          return res.status(400).json({ message: "로그인이 필요한 기능입니다." });
+        }
+        const wrongIds = await getWrongQuestionIdsForEmployee(employeeId);
+        questions = (await Promise.all(wrongIds.map(id => storage.getQuestion(id))))
+          .filter((q): q is Question => !!q);
+      } else if (mode === "bookmarked") {
+        if (!employeeId) {
+          return res.status(400).json({ message: "로그인이 필요한 기능입니다." });
+        }
+        const employeeBookmarks = await storage.getBookmarksForEmployee(employeeId);
+        questions = (await Promise.all(employeeBookmarks.map(b => storage.getQuestion(b.questionId))))
+          .filter((q): q is Question => !!q);
       } else {
         // Only get default questions for regular study modes
         questions = await storage.getQuestionsByAuthor("default");
       }
-      
+
       if (questions.length === 0) {
         if (mode === "wangsohee" || mode === "wangsohee-timer") {
           return res.status(404).json({ message: "아직 왕소희 제작 문제가 없습니다." });
         }
+        if (mode === "wrong") {
+          return res.status(404).json({ message: "틀린 문제가 없습니다! 완벽해요 🎉" });
+        }
+        if (mode === "bookmarked") {
+          return res.status(404).json({ message: "북마크한 문제가 없습니다." });
+        }
         return res.status(404).json({ message: "No questions available" });
+      }
+
+      // 과목 필터 (전체 조회가 필요한 어려운 문제 모드는 제외)
+      if (subject && subject !== "all" && mode !== "difficult") {
+        questions = questions.filter(q => q.subject === subject);
+        if (questions.length === 0) {
+          return res.status(404).json({ message: "해당 과목에는 아직 문제가 없습니다." });
+        }
       }
 
       // Special handling for difficult mode
@@ -584,7 +790,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // 관리자 API - 문제 등록
   app.post("/api/admin/questions", async (req, res) => {
     try {
-      const { type, questionId, stem, explanation, tags, difficulty, source, answer, choices, author } = req.body;
+      const { type, questionId, stem, explanation, tags, subject, difficulty, source, answer, choices, author } = req.body;
 
       if (!type || !questionId || !stem || !explanation) {
         return res.status(400).json({ message: "필수 필드가 누락되었습니다." });
@@ -597,6 +803,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         stem,
         explanation,
         tags: tags || null,
+        subject: subject || null,
         difficulty: difficulty || null,
         source: source || null,
         answer: type === "OX" ? answer : null,
@@ -635,7 +842,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const results = [];
 
       for (const questionData of questions) {
-        const { type, questionId, stem, explanation, tags, difficulty, source, answer, choices, author } = questionData;
+        const { type, questionId, stem, explanation, tags, subject, difficulty, source, answer, choices, author } = questionData;
 
         if (!type || !questionId || !stem || !explanation) {
           results.push({ questionId, success: false, error: "필수 필드 누락" });
@@ -650,6 +857,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             stem,
             explanation,
             tags: tags || null,
+            subject: subject || null,
             difficulty: difficulty || null,
             source: source || null,
             answer: type === "OX" ? answer : null,
@@ -728,6 +936,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               const stem = row.stem || row["문제내용"];
               const explanation = row.explanation || row["해설"];
               const tags = row.tags || row["태그"] || null;
+              const subject = row.subject || row["과목"] || null;
               const difficulty = (row.difficulty || row["난이도"]) ? parseInt(row.difficulty || row["난이도"]) : null;
               const source = row.source || row["출처"] || null;
 
@@ -773,6 +982,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     stem,
                     explanation,
                     tags,
+                    subject,
                     difficulty,
                     source,
                     answer: answerBoolean,
@@ -791,6 +1001,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     stem,
                     explanation,
                     tags,
+                    subject,
                     difficulty,
                     source,
                     answer: null,
@@ -941,7 +1152,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.setHeader('Content-Disposition', 'attachment; filename="kb_exam_questions.csv"');
       
       // CSV 헤더 (BOM 제거)
-      const header = 'question_id,type,stem,explanation,tags,difficulty,source,answer,choice1,choice2,choice3,choice4,correct_answer\n';
+      const header = 'question_id,type,stem,explanation,tags,subject,difficulty,source,answer,choice1,choice2,choice3,choice4,correct_answer\n';
       res.write(header);
 
       // 각 문제를 CSV 형식으로 변환
@@ -954,6 +1165,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         csvRow += `"${question.stem.replace(/"/g, '""')}",`;
         csvRow += `"${question.explanation?.replace(/"/g, '""') || ''}",`;
         csvRow += `"${question.tags || ''}",`;
+        csvRow += `"${question.subject || ''}",`;
         csvRow += `"${question.difficulty || ''}",`;
         csvRow += `"${question.source || ''}",`;
 

@@ -1,10 +1,12 @@
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import CommentSection from "@/components/CommentSection";
+import { api } from "@/lib/api";
 import mascotImage from "@assets/Adobe Express 2025-08-21 12시 40분 8초_1755747624195.png";
 
 interface HomeProps {
-  onStart: (questionCount?: number, difficulty?: number) => void;
+  onStart: (questionCount?: number, difficulty?: number, subject?: string) => void;
   onStartTimer: () => void;
   onStartDifficult: () => void;
   onStartWangsohee: () => void;
@@ -12,6 +14,13 @@ interface HomeProps {
 }
 
 export default function Home({ onStart, onStartTimer, onStartDifficult, onStartWangsohee, onStartWangsoheeTimer }: HomeProps) {
+  const [subjects, setSubjects] = useState<string[]>([]);
+  const [selectedSubject, setSelectedSubject] = useState<string>("all");
+
+  useEffect(() => {
+    api.getSubjects().then(setSubjects).catch(() => setSubjects([]));
+  }, []);
+
   return (
     <div className="container mx-auto max-w-6xl p-3 sm:p-4">
       <Card className="mt-4 shadow-sm bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
@@ -48,6 +57,38 @@ export default function Home({ onStart, onStartTimer, onStartDifficult, onStartW
             </div>
           </div>
 
+          {/* 과목 선택 (기본 학습 모드에 적용됩니다) */}
+          {subjects.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 mb-4 sm:mb-6" data-testid="row-subject-filter">
+              <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mr-1">과목:</span>
+              <button
+                onClick={() => setSelectedSubject("all")}
+                className={`px-3 py-1 rounded-full text-xs sm:text-sm border transition-colors ${
+                  selectedSubject === "all"
+                    ? "bg-yellow-500 border-yellow-500 text-white"
+                    : "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-yellow-400"
+                }`}
+                data-testid="button-subject-all"
+              >
+                전체
+              </button>
+              {subjects.map((subject) => (
+                <button
+                  key={subject}
+                  onClick={() => setSelectedSubject(subject)}
+                  className={`px-3 py-1 rounded-full text-xs sm:text-sm border transition-colors ${
+                    selectedSubject === subject
+                      ? "bg-yellow-500 border-yellow-500 text-white"
+                      : "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-yellow-400"
+                  }`}
+                  data-testid={`button-subject-${subject}`}
+                >
+                  {subject}
+                </button>
+              ))}
+            </div>
+          )}
+
           {/* 메인 버튼 그리드 */}
           <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
             {/* 1. 기본 학습 모드 */}
@@ -58,7 +99,7 @@ export default function Home({ onStart, onStartTimer, onStartDifficult, onStartW
               </div>
               <div className="space-y-2 sm:space-y-3">
                 <Button
-                  onClick={() => onStart()}
+                  onClick={() => onStart(undefined, undefined, selectedSubject)}
                   className="w-full bg-blue-500 hover:bg-blue-600 dark:bg-blue-700 dark:hover:bg-blue-800 text-white font-semibold py-3 sm:py-4 px-4 sm:px-6 rounded-xl transition-colors duration-200 shadow-sm text-sm sm:text-base"
                   data-testid="button-start-session-all"
                 >
@@ -116,7 +157,7 @@ export default function Home({ onStart, onStartTimer, onStartDifficult, onStartW
                   🤔 남들은 뭘 많이 틀렸을까? (TOP 20)
                 </Button>
                 <Button
-                  onClick={() => onStart(10)}
+                  onClick={() => onStart(10, undefined, selectedSubject)}
                   className="w-full bg-purple-600 hover:bg-purple-700 dark:bg-purple-800 dark:hover:bg-purple-900 text-white font-semibold py-3 sm:py-4 px-4 sm:px-6 rounded-xl transition-colors duration-200 shadow-sm text-sm sm:text-base"
                   data-testid="button-start-session-random"
                 >
@@ -133,21 +174,21 @@ export default function Home({ onStart, onStartTimer, onStartDifficult, onStartW
               </div>
               <div className="grid grid-cols-3 gap-2 sm:gap-3">
                 <Button
-                  onClick={() => onStart(undefined, 1)}
+                  onClick={() => onStart(undefined, 1, selectedSubject)}
                   className="bg-green-500 hover:bg-green-600 dark:bg-green-700 dark:hover:bg-green-800 text-white font-semibold py-2 sm:py-3 px-2 sm:px-4 rounded-xl transition-colors duration-200 shadow-sm text-xs sm:text-sm"
                   data-testid="button-start-difficulty-1"
                 >
                   😊 쉬움
                 </Button>
                 <Button
-                  onClick={() => onStart(undefined, 2)}
+                  onClick={() => onStart(undefined, 2, selectedSubject)}
                   className="bg-orange-500 hover:bg-orange-600 dark:bg-orange-700 dark:hover:bg-orange-800 text-white font-semibold py-2 sm:py-3 px-2 sm:px-4 rounded-xl transition-colors duration-200 shadow-sm text-xs sm:text-sm"
                   data-testid="button-start-difficulty-2"
                 >
                   😐 보통
                 </Button>
                 <Button
-                  onClick={() => onStart(undefined, 3)}
+                  onClick={() => onStart(undefined, 3, selectedSubject)}
                   className="bg-red-500 hover:bg-red-600 dark:bg-red-700 dark:hover:bg-red-800 text-white font-semibold py-2 sm:py-3 px-2 sm:px-4 rounded-xl transition-colors duration-200 shadow-sm text-xs sm:text-sm"
                   data-testid="button-start-difficulty-3"
                 >

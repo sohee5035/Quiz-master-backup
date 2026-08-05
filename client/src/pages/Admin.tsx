@@ -16,6 +16,9 @@ import { Badge } from "@/components/ui/badge";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import QuestionDetailModal from "@/components/QuestionDetailModal";
 
+// 과목 입력 자동완성용 기본 제안 목록 (직접 입력으로 새 과목 추가 가능)
+const SUBJECT_SUGGESTIONS = ["수신", "개인여신", "기업여신", "집합투자", "신용카드"];
+
 // 조회수 통계 컴포넌트
 function StatsCard() {
   const { data: stats, isLoading } = useQuery<{
@@ -802,6 +805,7 @@ function ManageQuestionsCard() {
     stem: "",
     explanation: "",
     tags: "",
+    subject: "",
     difficulty: "",
     source: "",
     answer: null as boolean | null,
@@ -904,6 +908,7 @@ function ManageQuestionsCard() {
       stem: question.stem,
       explanation: question.explanation || "",
       tags: question.tags || "",
+      subject: question.subject || "",
       difficulty: question.difficulty?.toString() || "",
       source: question.source || "",
       answer: question.answer,
@@ -971,6 +976,7 @@ function ManageQuestionsCard() {
       stem: editForm.stem,
       explanation: editForm.explanation || null,
       tags: editForm.tags || null,
+      subject: editForm.subject || null,
       difficulty: editForm.difficulty ? parseInt(editForm.difficulty) : null,
       source: editForm.source || null,
       answer: editingQuestion.type === "OX" ? editForm.answer : null,
@@ -1207,6 +1213,19 @@ function ManageQuestionsCard() {
               />
             </div>
 
+            {/* 과목 */}
+            <div>
+              <Label htmlFor="edit-subject">과목</Label>
+              <Input
+                id="edit-subject"
+                value={editForm.subject}
+                onChange={(e) => setEditForm(prev => ({ ...prev, subject: e.target.value }))}
+                placeholder="예: 수신"
+                list="subject-suggestions"
+                data-testid="input-edit-subject"
+              />
+            </div>
+
             {/* 난이도 */}
             <div>
               <Label htmlFor="edit-difficulty">난이도</Label>
@@ -1261,6 +1280,139 @@ function ManageQuestionsCard() {
   );
 }
 
+// 직원 명부 관리 컴포넌트
+function EmployeeManagement() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [newId, setNewId] = useState("");
+  const [newName, setNewName] = useState("");
+
+  const { data, isLoading } = useQuery<{ employees: { id: string; name: string; createdAt: string | null }[] }>({
+    queryKey: ['/api/admin/employees'],
+  });
+
+  const createMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch("/api/admin/employees", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ employeeId: newId.trim(), name: newName.trim() }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || "등록에 실패했습니다.");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({ title: "등록 완료", description: "직원이 등록되었습니다." });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/employees'] });
+      setNewId("");
+      setNewName("");
+    },
+    onError: (error: any) => {
+      toast({ title: "오류", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (employeeId: string) => {
+      const res = await fetch(`/api/admin/employees/${employeeId}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("삭제에 실패했습니다.");
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({ title: "삭제 완료", description: "직원이 삭제되었습니다." });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/employees'] });
+    },
+    onError: (error: any) => {
+      toast({ title: "오류", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const handleCreate = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newId.trim() || !newName.trim()) {
+      toast({ title: "오류", description: "직원번호와 이름을 모두 입력해주세요.", variant: "destructive" });
+      return;
+    }
+    createMutation.mutate();
+  };
+
+  const handleDelete = (employeeId: string, name: string) => {
+    if (window.confirm(`${name}(${employeeId}) 님을 명부에서 삭제하시겠습니까?`)) {
+      deleteMutation.mutate(employeeId);
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>직원 명부</CardTitle>
+        <CardDescription>
+          직원번호와 이름을 등록해두면, 직원은 비밀번호 없이 직원번호만으로 로그인해서 이력·틀린 문제·북마크 기능을 이용할 수 있어요.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <form onSubmit={handleCreate} className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-3 items-end">
+          <div>
+            <Label htmlFor="new-employee-id">직원번호</Label>
+            <Input
+              id="new-employee-id"
+              value={newId}
+              onChange={(e) => setNewId(e.target.value)}
+              placeholder="예: 12345"
+              data-testid="input-new-employee-id"
+            />
+          </div>
+          <div>
+            <Label htmlFor="new-employee-name">이름</Label>
+            <Input
+              id="new-employee-name"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              placeholder="예: 홍길동"
+              data-testid="input-new-employee-name"
+            />
+          </div>
+          <Button type="submit" disabled={createMutation.isPending} data-testid="button-add-employee">
+            {createMutation.isPending ? "등록 중..." : "등록"}
+          </Button>
+        </form>
+
+        {isLoading ? (
+          <div className="flex justify-center py-8"><Spinner /></div>
+        ) : !data?.employees.length ? (
+          <p className="text-sm text-gray-500 dark:text-gray-400">등록된 직원이 없습니다.</p>
+        ) : (
+          <div className="space-y-2">
+            {data.employees.map((employee) => (
+              <div
+                key={employee.id}
+                className="flex items-center justify-between p-3 rounded-lg border border-gray-200 dark:border-gray-700"
+                data-testid={`row-employee-${employee.id}`}
+              >
+                <div>
+                  <p className="font-medium text-gray-900 dark:text-white">{employee.name}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">직원번호 {employee.id}</p>
+                </div>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => handleDelete(employee.id, employee.name)}
+                  data-testid={`button-delete-employee-${employee.id}`}
+                >
+                  삭제
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function Admin() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -1273,6 +1425,7 @@ export default function Admin() {
     answer: "",
     explanation: "",
     tags: "",
+    subject: "",
     difficulty: "",
     source: "",
     author: "default"
@@ -1289,6 +1442,7 @@ export default function Admin() {
     correctAnswer: "",
     explanation: "",
     tags: "",
+    subject: "",
     difficulty: "",
     source: "",
     author: "default"
@@ -1318,6 +1472,7 @@ export default function Admin() {
         answer: "",
         explanation: "",
         tags: "",
+        subject: "",
         difficulty: "",
         source: "",
         author: "default"
@@ -1332,6 +1487,7 @@ export default function Admin() {
         correctAnswer: "",
         explanation: "",
         tags: "",
+        subject: "",
         difficulty: "",
         source: "",
         author: "default"
@@ -1518,6 +1674,7 @@ export default function Admin() {
       stem: mcqForm.stem,
       explanation: mcqForm.explanation,
       tags: mcqForm.tags,
+      subject: mcqForm.subject,
       difficulty: mcqForm.difficulty ? parseInt(mcqForm.difficulty) : null,
       source: mcqForm.source,
       author: mcqForm.author,
@@ -1537,6 +1694,11 @@ export default function Admin() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
+      <datalist id="subject-suggestions">
+        {SUBJECT_SUGGESTIONS.map((subject) => (
+          <option key={subject} value={subject} />
+        ))}
+      </datalist>
       <div className="max-w-4xl mx-auto">
         <Card>
           <CardHeader>
@@ -1545,13 +1707,14 @@ export default function Admin() {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="stats" className="w-full">
-              <TabsList className="grid w-full grid-cols-6">
+              <TabsList className="grid w-full grid-cols-7">
                 <TabsTrigger value="stats">조회수 통계</TabsTrigger>
                 <TabsTrigger value="comments">댓글 관리</TabsTrigger>
                 <TabsTrigger value="manage">문제 관리</TabsTrigger>
                 <TabsTrigger value="ox">OX 문제</TabsTrigger>
                 <TabsTrigger value="mcq">사지선다</TabsTrigger>
                 <TabsTrigger value="csv">CSV 업로드</TabsTrigger>
+                <TabsTrigger value="employees">직원 관리</TabsTrigger>
               </TabsList>
 
               <TabsContent value="stats" className="space-y-4">
@@ -1622,7 +1785,7 @@ export default function Admin() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                     <div>
                       <Label htmlFor="ox-tags">태그</Label>
                       <Input
@@ -1631,6 +1794,17 @@ export default function Admin() {
                         onChange={(e) => setOxForm({...oxForm, tags: e.target.value})}
                         placeholder="예: 환율우대"
                         data-testid="input-ox-tags"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="ox-subject">과목</Label>
+                      <Input
+                        id="ox-subject"
+                        value={oxForm.subject}
+                        onChange={(e) => setOxForm({...oxForm, subject: e.target.value})}
+                        placeholder="예: 수신"
+                        list="subject-suggestions"
+                        data-testid="input-ox-subject"
                       />
                     </div>
                     <div>
@@ -1781,7 +1955,7 @@ export default function Admin() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                     <div>
                       <Label htmlFor="mcq-tags">태그</Label>
                       <Input
@@ -1790,6 +1964,17 @@ export default function Admin() {
                         onChange={(e) => setMcqForm({...mcqForm, tags: e.target.value})}
                         placeholder="예: 환율우대"
                         data-testid="input-mcq-tags"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="mcq-subject">과목</Label>
+                      <Input
+                        id="mcq-subject"
+                        value={mcqForm.subject}
+                        onChange={(e) => setMcqForm({...mcqForm, subject: e.target.value})}
+                        placeholder="예: 수신"
+                        list="subject-suggestions"
+                        data-testid="input-mcq-subject"
                       />
                     </div>
                     <div>
@@ -1872,7 +2057,7 @@ export default function Admin() {
                         data-testid="input-csv-file"
                       />
                       <p className="text-sm text-gray-500 mt-1">
-                        CSV 파일 형식: question_id, stem, explanation, tags, difficulty, source, answer/choices
+                        CSV 파일 형식: question_id, stem, explanation, tags, subject(과목), difficulty, source, answer/choices
                       </p>
                     </div>
                     
@@ -1911,6 +2096,10 @@ export default function Admin() {
                     </Button>
                   </div>
                 </div>
+              </TabsContent>
+
+              <TabsContent value="employees" className="space-y-4">
+                <EmployeeManagement />
               </TabsContent>
 
             </Tabs>
