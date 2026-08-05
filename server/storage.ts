@@ -1,7 +1,7 @@
-import { type Question, type Choice, type Session, type Response, type PageView, type Comment, type InsertQuestion, type InsertChoice, type InsertSession, type InsertResponse, type InsertPageView, type InsertComment } from "@shared/schema";
+import { type Question, type Choice, type Session, type Response, type PageView, type Comment, type Employee, type Bookmark, type InsertQuestion, type InsertChoice, type InsertSession, type InsertResponse, type InsertPageView, type InsertComment, type InsertEmployee, type InsertBookmark } from "@shared/schema";
 import { database as db, isDbConnected } from "./db";
-import { questions, choices, sessions, responses, pageViews, comments } from "@shared/schema";
-import { eq, sql, gte } from "drizzle-orm";
+import { questions, choices, sessions, responses, pageViews, comments, employees, bookmarks } from "@shared/schema";
+import { eq, and, sql, gte, desc } from "drizzle-orm";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -19,7 +19,20 @@ export interface IStorage {
   createSession(session: InsertSession): Promise<Session>;
   getSession(id: string): Promise<Session | undefined>;
   getAllSessions(): Promise<Session[]>;
+  getSessionsForEmployee(employeeId: string): Promise<Session[]>;
   endSession(id: string): Promise<void>;
+
+  // Employees
+  getEmployee(id: string): Promise<Employee | undefined>;
+  getAllEmployees(): Promise<Employee[]>;
+  createEmployee(employee: InsertEmployee): Promise<Employee>;
+  updateEmployee(id: string, name: string): Promise<Employee>;
+  deleteEmployee(id: string): Promise<void>;
+
+  // Bookmarks
+  getBookmarksForEmployee(employeeId: string): Promise<Bookmark[]>;
+  addBookmark(employeeId: string, questionId: string): Promise<Bookmark>;
+  removeBookmark(employeeId: string, questionId: string): Promise<void>;
   
   // Responses
   createResponse(response: InsertResponse): Promise<Response>;
@@ -224,11 +237,79 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(sessions);
   }
 
+  async getSessionsForEmployee(employeeId: string): Promise<Session[]> {
+    return await db
+      .select()
+      .from(sessions)
+      .where(eq(sessions.employeeId, employeeId))
+      .orderBy(desc(sessions.startedAt));
+  }
+
   async endSession(id: string): Promise<void> {
     await db
       .update(sessions)
       .set({ endedAt: new Date() })
       .where(eq(sessions.id, id));
+  }
+
+  async getEmployee(id: string): Promise<Employee | undefined> {
+    const [employee] = await db.select().from(employees).where(eq(employees.id, id));
+    return employee || undefined;
+  }
+
+  async getAllEmployees(): Promise<Employee[]> {
+    return await db.select().from(employees);
+  }
+
+  async createEmployee(insertEmployee: InsertEmployee): Promise<Employee> {
+    const [employee] = await db.insert(employees).values(insertEmployee).returning();
+    return employee;
+  }
+
+  async updateEmployee(id: string, name: string): Promise<Employee> {
+    const [employee] = await db
+      .update(employees)
+      .set({ name })
+      .where(eq(employees.id, id))
+      .returning();
+
+    if (!employee) {
+      throw new Error("Employee not found");
+    }
+
+    return employee;
+  }
+
+  async deleteEmployee(id: string): Promise<void> {
+    await db.delete(bookmarks).where(eq(bookmarks.employeeId, id));
+    await db.delete(employees).where(eq(employees.id, id));
+  }
+
+  async getBookmarksForEmployee(employeeId: string): Promise<Bookmark[]> {
+    return await db.select().from(bookmarks).where(eq(bookmarks.employeeId, employeeId));
+  }
+
+  async addBookmark(employeeId: string, questionId: string): Promise<Bookmark> {
+    const existing = await db
+      .select()
+      .from(bookmarks)
+      .where(and(eq(bookmarks.employeeId, employeeId), eq(bookmarks.questionId, questionId)));
+
+    if (existing.length > 0) {
+      return existing[0];
+    }
+
+    const [bookmark] = await db
+      .insert(bookmarks)
+      .values({ id: randomUUID(), employeeId, questionId })
+      .returning();
+    return bookmark;
+  }
+
+  async removeBookmark(employeeId: string, questionId: string): Promise<void> {
+    await db
+      .delete(bookmarks)
+      .where(and(eq(bookmarks.employeeId, employeeId), eq(bookmarks.questionId, questionId)));
   }
 
   async createResponse(insertResponse: InsertResponse): Promise<Response> {
@@ -536,6 +617,8 @@ export class MemStorage implements IStorage {
   private responses: Map<string, Response>;
   private pageViews: Map<string, PageView>;
   private comments: Map<string, Comment>;
+  private employees: Map<string, Employee>;
+  private bookmarks: Map<string, Bookmark>;
 
   constructor() {
     this.questions = new Map();
@@ -544,7 +627,9 @@ export class MemStorage implements IStorage {
     this.responses = new Map();
     this.pageViews = new Map();
     this.comments = new Map();
-    
+    this.employees = new Map();
+    this.bookmarks = new Map();
+
     this.seedData();
   }
 
@@ -556,6 +641,7 @@ export class MemStorage implements IStorage {
       stem: "다음 중 수신업무에서 요구불예금에 해당하지 않는 것은?",
       explanation: "정기예금은 만기가 정해진 저축성예금으로, 요구불예금이 아닙니다.",
       tags: "수신업무",
+      subject: "수신",
       difficulty: 1,
       source: "은행실무종합과정",
       answer: null,
@@ -568,6 +654,7 @@ export class MemStorage implements IStorage {
       stem: "금융실명거래 및 비밀보장에 관한 법률에 따라 금융거래 정보는 명의인의 서면 동의 없이 제3자에게 제공할 수 없다.",
       explanation: "금융실명법에 따라 금융거래정보는 원칙적으로 명의인의 서면상 동의 없이 타인에게 제공하거나 누설할 수 없습니다.",
       tags: "금융실명법",
+      subject: "수신",
       difficulty: 1,
       source: "은행실무종합과정",
       answer: true,
@@ -607,6 +694,7 @@ export class MemStorage implements IStorage {
       id,
       explanation: insertQuestion.explanation ?? null,
       tags: insertQuestion.tags ?? null,
+      subject: insertQuestion.subject ?? null,
       difficulty: insertQuestion.difficulty ?? null,
       source: insertQuestion.source ?? null,
       answer: insertQuestion.answer ?? null,
@@ -672,6 +760,8 @@ export class MemStorage implements IStorage {
     const session: Session = {
       ...insertSession,
       id,
+      ipAddress: insertSession.ipAddress ?? null,
+      employeeId: insertSession.employeeId ?? null,
       startedAt: new Date(),
       endedAt: null,
     };
@@ -687,11 +777,80 @@ export class MemStorage implements IStorage {
     return Array.from(this.sessions.values());
   }
 
+  async getSessionsForEmployee(employeeId: string): Promise<Session[]> {
+    return Array.from(this.sessions.values())
+      .filter(session => session.employeeId === employeeId)
+      .sort((a, b) => (b.startedAt?.getTime() || 0) - (a.startedAt?.getTime() || 0));
+  }
+
   async endSession(id: string): Promise<void> {
     const session = this.sessions.get(id);
     if (session) {
       session.endedAt = new Date();
       this.sessions.set(id, session);
+    }
+  }
+
+  async getEmployee(id: string): Promise<Employee | undefined> {
+    return this.employees.get(id);
+  }
+
+  async getAllEmployees(): Promise<Employee[]> {
+    return Array.from(this.employees.values());
+  }
+
+  async createEmployee(insertEmployee: InsertEmployee): Promise<Employee> {
+    const employee: Employee = {
+      id: insertEmployee.id,
+      name: insertEmployee.name,
+      createdAt: new Date(),
+    };
+    this.employees.set(employee.id, employee);
+    return employee;
+  }
+
+  async updateEmployee(id: string, name: string): Promise<Employee> {
+    const existing = this.employees.get(id);
+    if (!existing) {
+      throw new Error("Employee not found");
+    }
+    const updated: Employee = { ...existing, name };
+    this.employees.set(id, updated);
+    return updated;
+  }
+
+  async deleteEmployee(id: string): Promise<void> {
+    this.employees.delete(id);
+    const toDelete = Array.from(this.bookmarks.values()).filter(b => b.employeeId === id);
+    toDelete.forEach(b => this.bookmarks.delete(b.id));
+  }
+
+  async getBookmarksForEmployee(employeeId: string): Promise<Bookmark[]> {
+    return Array.from(this.bookmarks.values()).filter(b => b.employeeId === employeeId);
+  }
+
+  async addBookmark(employeeId: string, questionId: string): Promise<Bookmark> {
+    const existing = Array.from(this.bookmarks.values())
+      .find(b => b.employeeId === employeeId && b.questionId === questionId);
+    if (existing) {
+      return existing;
+    }
+
+    const bookmark: Bookmark = {
+      id: randomUUID(),
+      employeeId,
+      questionId,
+      createdAt: new Date(),
+    };
+    this.bookmarks.set(bookmark.id, bookmark);
+    return bookmark;
+  }
+
+  async removeBookmark(employeeId: string, questionId: string): Promise<void> {
+    const toDelete = Array.from(this.bookmarks.values())
+      .find(b => b.employeeId === employeeId && b.questionId === questionId);
+    if (toDelete) {
+      this.bookmarks.delete(toDelete.id);
     }
   }
 
@@ -1008,3 +1167,26 @@ export const storage = (() => {
     return new MemStorage();
   }
 })();
+
+// 직원이 지금 시점 기준으로 틀리고 있는 문제 ID 목록
+// (같은 문제를 여러 번 풀었다면 가장 최근 응답 기준으로 판단)
+export async function getWrongQuestionIdsForEmployee(employeeId: string): Promise<string[]> {
+  const employeeSessions = await storage.getSessionsForEmployee(employeeId);
+  const latestResponseByQuestion = new Map<string, Response>();
+
+  for (const session of employeeSessions) {
+    const sessionResponses = await storage.getResponsesForSession(session.id);
+    for (const response of sessionResponses) {
+      const existing = latestResponseByQuestion.get(response.questionId);
+      const existingTime = existing?.createdAt?.getTime() ?? 0;
+      const responseTime = response.createdAt?.getTime() ?? 0;
+      if (!existing || responseTime >= existingTime) {
+        latestResponseByQuestion.set(response.questionId, response);
+      }
+    }
+  }
+
+  return Array.from(latestResponseByQuestion.values())
+    .filter(response => !response.isCorrect)
+    .map(response => response.questionId);
+}

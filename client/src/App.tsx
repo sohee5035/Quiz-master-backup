@@ -7,18 +7,33 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import { LoadingOverlay } from "@/components/ui/spinner";
 import { api } from "./lib/api";
+import { getStoredEmployee } from "./lib/auth";
+import LoginBar from "@/components/LoginBar";
 import Home from "./pages/home";
 import Question from "./pages/question";
 import Results from "./pages/results";
 import Admin from "./pages/Admin";
+import MyPage from "./pages/MyPage";
 import TimerMode from "./pages/TimerMode.tsx";
 import TimerResults from "./pages/TimerResults.tsx";
 import TimerSetup from "./pages/TimerSetup";
 import WangsoheeTimerSetup from "./pages/WangsoheeTimerSetup";
 import WangsoheeSetup from "./pages/WangsoheeSetup";
-import type { SessionResponse, AnswerResponse, ResultsResponse, TimerQuestionData, TimerResultsData } from "@shared/schema";
+import type { SessionResponse, AnswerResponse, ResultsResponse, TimerQuestionData, TimerResultsData, LoginResponse } from "@shared/schema";
 
-type AppState = "home" | "question" | "results" | "admin" | "timer" | "timer-results" | "timer-setup" | "wangsohee-timer-setup" | "wangsohee-setup";
+type AppState = "home" | "question" | "results" | "admin" | "mypage" | "timer" | "timer-results" | "timer-setup" | "wangsohee-timer-setup" | "wangsohee-setup";
+
+// apiRequest throws `${status}: ${responseText}` — try to pull out the server's { message } if present.
+function extractErrorMessage(error: unknown): string | null {
+  if (!(error instanceof Error)) return null;
+  const jsonPart = error.message.slice(error.message.indexOf(":") + 1).trim();
+  try {
+    const parsed = JSON.parse(jsonPart);
+    return typeof parsed.message === "string" ? parsed.message : null;
+  } catch {
+    return null;
+  }
+}
 
 function AppContent() {
   const [appState, setAppState] = useState<AppState>("home");
@@ -29,7 +44,53 @@ function AppContent() {
   const [currentTimerIndex, setCurrentTimerIndex] = useState(0);
   const [timerResults, setTimerResults] = useState<TimerResultsData | null>(null);
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+  const [employee, setEmployee] = useState<LoginResponse | null>(null);
+  const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
   const { toast } = useToast();
+
+  // 저장된 로그인 정보 복원
+  useEffect(() => {
+    const stored = getStoredEmployee();
+    if (stored) {
+      setEmployee(stored);
+      api.getBookmarkedQuestions(stored.employeeId)
+        .then(qs => setBookmarkedIds(new Set(qs.map(q => q.id))))
+        .catch(() => {});
+    }
+  }, []);
+
+  const handleLogin = (loggedInEmployee: LoginResponse) => {
+    setEmployee(loggedInEmployee);
+    api.getBookmarkedQuestions(loggedInEmployee.employeeId)
+      .then(qs => setBookmarkedIds(new Set(qs.map(q => q.id))))
+      .catch(() => {});
+  };
+
+  const handleLogout = () => {
+    setEmployee(null);
+    setBookmarkedIds(new Set());
+    setAppState("home");
+  };
+
+  const handleToggleBookmark = async (questionId: string) => {
+    if (!employee) return;
+    const alreadyBookmarked = bookmarkedIds.has(questionId);
+    try {
+      if (alreadyBookmarked) {
+        await api.removeBookmark(employee.employeeId, questionId);
+        setBookmarkedIds(prev => {
+          const next = new Set(prev);
+          next.delete(questionId);
+          return next;
+        });
+      } else {
+        await api.addBookmark(employee.employeeId, questionId);
+        setBookmarkedIds(prev => new Set(prev).add(questionId));
+      }
+    } catch (error) {
+      console.error("Failed to toggle bookmark:", error);
+    }
+  };
 
   // 다크모드 초기화 및 localStorage 연동
   useEffect(() => {
@@ -50,8 +111,8 @@ function AppContent() {
   };
 
   const startSessionMutation = useMutation({
-    mutationFn: ({ questionCount, difficulty, mode }: { questionCount?: number; difficulty?: number; mode?: string }) => 
-      api.startSession(mode || "study", questionCount, difficulty),
+    mutationFn: ({ questionCount, difficulty, mode, subject }: { questionCount?: number; difficulty?: number; mode?: string; subject?: string }) =>
+      api.startSession(mode || "study", questionCount, difficulty, subject, employee?.employeeId),
     onSuccess: (data) => {
       setSessionData(data);
       setAnswerResult(null);
@@ -60,7 +121,7 @@ function AppContent() {
     onError: (error) => {
       toast({
         title: "오류",
-        description: "세션을 시작할 수 없습니다.",
+        description: extractErrorMessage(error) || "세션을 시작할 수 없습니다.",
         variant: "destructive",
       });
       console.error("Failed to start session:", error);
@@ -237,8 +298,20 @@ function AppContent() {
     },
   });
 
-  const handleStart = (questionCount?: number, difficulty?: number) => {
-    startSessionMutation.mutate({ questionCount, difficulty });
+  const handleStart = (questionCount?: number, difficulty?: number, subject?: string) => {
+    startSessionMutation.mutate({ questionCount, difficulty, subject });
+  };
+
+  const handleStartWrong = () => {
+    startSessionMutation.mutate({ mode: "wrong" });
+  };
+
+  const handleStartBookmarked = () => {
+    startSessionMutation.mutate({ mode: "bookmarked" });
+  };
+
+  const handleOpenMyPage = () => {
+    setAppState("mypage");
   };
 
   const handleStartTimer = () => {
@@ -475,6 +548,8 @@ function AppContent() {
           onNext={handleNext}
           answerResult={answerResult || undefined}
           isLoading={nextQuestionMutation.isPending}
+          isBookmarked={employee ? bookmarkedIds.has(sessionData.question.id) : undefined}
+          onToggleBookmark={employee ? handleToggleBookmark : undefined}
         />
       )}
       
@@ -528,12 +603,24 @@ function AppContent() {
         <Admin />
       )}
 
+      {appState === "mypage" && employee && (
+        <MyPage
+          employee={employee}
+          onLogout={handleLogout}
+          onBack={handleHome}
+          onStartWrong={handleStartWrong}
+          onStartBookmarked={handleStartBookmarked}
+        />
+      )}
+
       {/* 하단 크레딧 */}
       <footer className="bg-white dark:bg-gray-800 border-t dark:border-gray-700 py-4 mt-8">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <p className="text-sm text-gray-500 dark:text-gray-400">제작: 왕소희대리</p>
         </div>
       </footer>
+
+      <LoginBar employee={employee} onLogin={handleLogin} onOpenMyPage={handleOpenMyPage} />
     </div>
   );
 }

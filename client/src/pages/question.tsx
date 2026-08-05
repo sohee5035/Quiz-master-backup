@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle, Bookmark } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import type { SessionResponse, AnswerResponse, QuestionWithChoices } from "@shared/schema";
 
@@ -12,9 +12,11 @@ interface QuestionProps {
   onNext: () => void;
   answerResult?: AnswerResponse;
   isLoading?: boolean;
+  isBookmarked?: boolean;
+  onToggleBookmark?: (questionId: string) => void;
 }
 
-export default function Question({ sessionData, onAnswer, onNext, answerResult, isLoading }: QuestionProps) {
+export default function Question({ sessionData, onAnswer, onNext, answerResult, isLoading, isBookmarked, onToggleBookmark }: QuestionProps) {
   const [selectedAnswer, setSelectedAnswer] = useState<string | boolean | null>(null);
   const { question, currentQuestion, totalQuestions } = sessionData;
 
@@ -117,10 +119,24 @@ export default function Question({ sessionData, onAnswer, onNext, answerResult, 
       {/* Question Card */}
       <Card className="mb-4 sm:mb-6 shadow-sm bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <CardContent className="p-4 sm:p-6">
-          <div className="mb-4 sm:mb-6">
+          <div className="mb-4 sm:mb-6 flex items-start justify-between gap-3">
             <p className="text-base sm:text-lg text-gray-900 dark:text-white leading-relaxed" data-testid="text-question-stem">
               {question.stem}
             </p>
+            {onToggleBookmark && (
+              <button
+                onClick={() => onToggleBookmark(question.id)}
+                className="flex-shrink-0 p-1 text-gray-400 hover:text-yellow-500 dark:hover:text-yellow-400 transition-colors"
+                title={isBookmarked ? "북마크 해제" : "북마크 추가"}
+                data-testid="button-toggle-bookmark"
+              >
+                <Bookmark
+                  className="h-5 w-5 sm:h-6 sm:w-6"
+                  fill={isBookmarked ? "currentColor" : "none"}
+                  color={isBookmarked ? "#eab308" : "currentColor"}
+                />
+              </button>
+            )}
           </div>
 
           {/* MCQ Options */}
