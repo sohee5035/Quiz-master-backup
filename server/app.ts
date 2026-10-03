@@ -1,6 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes";
-import { logEnvironmentStatus } from "./environment";
+import { registerRoutes } from "./routes.js";
+import { logEnvironmentStatus } from "./environment.js";
 
 // Shared Express app setup used by both the long-running local/Replit
 // server (server/index.ts) and the Vercel serverless entry (api/index.ts).

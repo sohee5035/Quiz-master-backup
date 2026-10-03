@@ -1,9 +1,9 @@
-import { type Question, type Choice, type Session, type Response, type PageView, type Comment, type Employee, type Bookmark, type InsertQuestion, type InsertChoice, type InsertSession, type InsertResponse, type InsertPageView, type InsertComment, type InsertEmployee, type InsertBookmark } from "@shared/schema";
-import { database as db, isDbConnected } from "./db";
-import { questions, choices, sessions, responses, pageViews, comments, employees, bookmarks } from "@shared/schema";
+import { type Question, type Choice, type Session, type Response, type PageView, type Comment, type Employee, type Bookmark, type InsertQuestion, type InsertChoice, type InsertSession, type InsertResponse, type InsertPageView, type InsertComment, type InsertEmployee, type InsertBookmark } from "../shared/schema.js";
+import { database as db, isDbConnected } from "./db.js";
+import { questions, choices, sessions, responses, pageViews, comments, employees, bookmarks } from "../shared/schema.js";
 import { eq, and, sql, gte, desc } from "drizzle-orm";
 import { randomUUID } from "crypto";
-import { sampleQuestions } from "./sampleQuestions";
+import { sampleQuestions } from "./sampleQuestions.js";
 
 export interface IStorage {
   // Questions

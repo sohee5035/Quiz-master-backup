@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "http";
-import { createApp } from "../server/app";
+import { createApp } from "../server/app.js";
 
 // Vercel Serverless Function entry point. The Express app is built once per
 // cold start and reused across warm invocations of this function.
