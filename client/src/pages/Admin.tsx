@@ -488,9 +488,9 @@ function AdminLogin({ onLogin }: { onLogin: () => void }) {
     e.preventDefault();
     setIsLoading(true);
 
-    // 비밀번호 확인 (1122)
+    // 비밀번호 확인 (000000)
     setTimeout(() => {
-      if (password === "1122") {
+      if (password === "000000") {
         toast({
           title: "로그인 성공",
           description: "관리자 페이지에 접근할 수 있습니다.",
