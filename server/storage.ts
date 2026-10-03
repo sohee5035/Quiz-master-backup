@@ -3,6 +3,7 @@ import { database as db, isDbConnected } from "./db";
 import { questions, choices, sessions, responses, pageViews, comments, employees, bookmarks } from "@shared/schema";
 import { eq, and, sql, gte, desc } from "drizzle-orm";
 import { randomUUID } from "crypto";
+import { sampleQuestions } from "./sampleQuestions";
 
 export interface IStorage {
   // Questions
@@ -673,6 +674,27 @@ export class MemStorage implements IStorage {
     ];
 
     choices1.forEach(choice => this.choices.set(choice.id, choice));
+
+    // 샘플 연습문제
+    for (const sq of sampleQuestions) {
+      this.questions.set(sq.id, {
+        id: sq.id,
+        type: sq.type,
+        stem: sq.stem,
+        explanation: sq.explanation,
+        tags: sq.tags,
+        subject: sq.subject,
+        difficulty: sq.difficulty,
+        source: "샘플 문제",
+        answer: sq.type === "OX" ? sq.answer ?? null : null,
+        author: "default",
+      });
+
+      sq.choices?.forEach((content, i) => {
+        const id = `${sq.id}c${i + 1}`;
+        this.choices.set(id, { id, questionId: sq.id, content, isCorrect: i + 1 === sq.correct });
+      });
+    }
   }
 
   async getQuestion(id: string): Promise<Question | undefined> {
