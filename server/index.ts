@@ -1,5 +1,5 @@
-import { createApp } from "./app";
-import { setupVite, serveStatic, log } from "./vite";
+import { createApp } from "./app.js";
+import { setupVite, serveStatic, log } from "./vite.js";
 
 (async () => {
   let app: Awaited<ReturnType<typeof createApp>>["app"];

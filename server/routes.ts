@@ -1,8 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage, getWrongQuestionIdsForEmployee } from "./storage";
+import { storage, getWrongQuestionIdsForEmployee } from "./storage.js";
 import { z } from "zod";
-import type { SessionResponse, AnswerResponse, ResultsResponse, QuestionWithChoices, Response, Question, SessionHistoryItem } from "@shared/schema";
+import type { SessionResponse, AnswerResponse, ResultsResponse, QuestionWithChoices, Response, Question, SessionHistoryItem } from "../shared/schema.js";
 import multer from "multer";
 import csv from "csv-parser";
 import { Readable } from "stream";
